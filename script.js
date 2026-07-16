@@ -978,15 +978,15 @@ class StageManager {
         const messages = {
             happy: {
                 title: "❤️ Abra quando estiver feliz",
-                body: "Fico imensamente feliz em saber que seu coração está radiante hoje! O seu sorriso é contagioso e ilumina tudo ao seu redor. Continue compartilhando essa energia positiva com o mundo e lembre-se de registrar este momento na memória. Sorria sempre! ✨"
+                body: "Se você está feliz, então meu coração sorri junto! E, se lembrar de mim nesse instante, saiba que vou ficar feliz em saber que um dos seus sorrisos também fez parte do meu dia ❤️. Continue compartilhando essa energia positiva com o mundo e lembre-se de registrar este momento na memória! ✨"
             },
             miss: {
                 title: "🤍 Abra quando sentir saudade",
-                body: "A distância física ou o tempo sem se falar não diminui em nada o carinho que guardo por você. Feche os olhos por um segundo e sinta este abraço virtual apertado que estou te enviando agora. Não importa onde, estarei sempre torcendo por você e lembrando dos nossos melhores momentos. ⏳"
+                body: "A distância física ou o tempo sem se falar não diminui em nada o carinho que guardo por você. Feche os olhos por um segundo e sinta este abraço virtual apertado que estou te enviando agora. Não importa onde, estarei sempre torcendo por você e lembrando dos nossos melhores momentos, se sentir vontade 📞, Vou gostar de ouvir sua voz⏳"
             },
             smile: {
                 title: "✨ Abra quando precisar sorrir",
-                body: "Caso o dia esteja cinza, lembre-se: você é uma pessoa incrível, cheia de luz, força e talentos únicos. O mundo fica muito melhor com a sua presença. Deixo aqui um lembrete especial de que você é extremamente especial para mim, e que sua felicidade é o meu maior desejo. Sorria, o dia vai melhorar! 🌟"
+                body: "Respira... Lembra de quantas vezes a gente riu de coisas sem sentido? Você é uma pessoa incrível. A vida pode ser pesada às vezes, mas nunca deixe que ela roube esse sorriso bonito que você tem. E, se ele insistir em não aparecer, me chama. A gente dá um jeito de encontrar um motivo para rir de novo 😊❤️. Deixo aqui um lembrete especial de que você é extremamente especial para mim, Sorria, o dia vai melhorar! 🌟"
             }
         };
 
@@ -1275,13 +1275,13 @@ class StageManager {
             });
 
             // Reseta textos sequenciais (só usam opacity via .show)
-            ['final-text-1','final-text-2','final-text-3','final-text-4'].forEach(id => {
+            ['final-text-1', 'final-text-2', 'final-text-3', 'final-text-4'].forEach(id => {
                 const el = document.getElementById(id);
                 if (el) el.classList.remove('show');
             });
 
             // Reseta textos do encerramento (voltam ao hidden)
-            ['ending-text-1','ending-text-2'].forEach(id => {
+            ['ending-text-1', 'ending-text-2'].forEach(id => {
                 const el = document.getElementById(id);
                 if (el) { el.classList.remove('show'); el.classList.add('hidden'); }
             });
