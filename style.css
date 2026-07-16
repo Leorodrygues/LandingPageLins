@@ -1,0 +1,1776 @@
+/* ==========================================================================
+   DESIGN SYSTEM & VARIÁVEIS
+   ========================================================================== */
+:root {
+    /* Paleta de Cores Mágica e Cinematográfica */
+    --color-bg-deep: #0a0b1e;
+    --color-bg-mid: #12132e;
+    --color-bg-light: #1b1c3f;
+    --color-accent-pink: #ff758f;
+    --color-accent-gold: #fcd34d;
+    --color-accent-blue: #60a5fa;
+    --color-accent-purple: #c084fc;
+    --color-text-main: #f3f4f6;
+    --color-text-sub: #9ca3af;
+    --color-heart: #ef4444;
+
+    /* Glassmorphism */
+    --glass-bg: rgba(18, 19, 46, 0.45);
+    --glass-border: rgba(255, 255, 255, 0.08);
+    --glass-shadow: rgba(0, 0, 0, 0.5);
+    
+    /* Fontes */
+    --font-main: 'Inter', sans-serif;
+    --font-heading: 'Playfair Display', serif;
+    --font-handwritten: 'Alex Brush', cursive;
+
+    /* Transições */
+    --transition-cinema: all 1.2s cubic-bezier(0.25, 1, 0.5, 1);
+    --transition-smooth: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+    --transition-elastic: all 0.6s cubic-bezier(0.34, 1.56, 0.64, 1);
+    --transition-glass: all 0.5s cubic-bezier(0.23, 1, 0.32, 1);
+}
+
+/* ==========================================================================
+   RESET & ESTILOS BASE
+   ========================================================================== */
+*, *::before, *::after {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+}
+
+body {
+    font-family: var(--font-main);
+    background-color: var(--color-bg-deep);
+    color: var(--color-text-main);
+    overflow: hidden;
+    height: 100vh;
+    height: 100dvh;
+    width: 100vw;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    perspective: 1000px;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    text-rendering: optimizeLegibility;
+}
+
+/* Loading Screen */
+.loading-screen {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: var(--color-bg-deep);
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    z-index: 9999;
+    transition: opacity 0.8s ease-out;
+}
+.loading-screen.hidden {
+    opacity: 0;
+    pointer-events: none;
+}
+.loading-spinner {
+    width: 50px;
+    height: 50px;
+    border: 3px solid rgba(255, 117, 143, 0.15);
+    border-top-color: var(--color-accent-pink);
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+    margin-bottom: 20px;
+}
+@keyframes spin {
+    to { transform: rotate(360deg); }
+}
+.loading-text {
+    font-family: var(--font-main);
+    font-size: 1rem;
+    color: var(--color-text-sub);
+    animation: pulse 1.5s ease-in-out infinite;
+}
+@keyframes pulse {
+    0%, 100% { opacity: 0.5; }
+    50% { opacity: 1; }
+}
+
+/* Canvas de Fundo (Partículas Globais) */
+#bg-canvas {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: 1;
+    pointer-events: none;
+}
+
+/* Overlays Cinematográficos */
+.cinema-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: #000;
+    opacity: 0;
+    z-index: 999;
+    pointer-events: none;
+    transition: opacity 1.2s cubic-bezier(0.4, 0, 0.2, 1);
+}
+.cinema-overlay.active {
+    opacity: 0.95;
+}
+
+.flash-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: #fff;
+    opacity: 0;
+    z-index: 1000;
+    pointer-events: none;
+    transition: opacity 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+.flash-overlay.active {
+    opacity: 1;
+}
+
+/* Container de Música Flutuante */
+.music-toggle-btn {
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    z-index: 100;
+    background: var(--glass-bg);
+    border: 1px solid var(--glass-border);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    color: var(--color-accent-pink);
+    width: 48px;
+    height: 48px;
+    border-radius: 50%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    cursor: pointer;
+    box-shadow: 0 4px 20px var(--glass-shadow);
+    transition: var(--transition-smooth);
+    opacity: 1;
+}
+.music-toggle-btn:hover {
+    transform: scale(1.1);
+    box-shadow: 0 0 15px rgba(255, 117, 143, 0.4);
+    background: rgba(255, 117, 143, 0.1);
+}
+.music-toggle-btn.hidden {
+    opacity: 0;
+    transform: scale(0.8);
+    pointer-events: none;
+}
+.music-toggle-btn .icon {
+    width: 24px;
+    height: 24px;
+    transition: var(--transition-smooth);
+}
+.music-toggle-btn .icon.hidden {
+    display: none;
+}
+
+/* Container Principal */
+#main-container {
+    position: relative;
+    width: 100%;
+    height: 100%;
+    z-index: 5;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+/* ==========================================================================
+   ESTADOS DAS ETAPAS (SISTEMA DE NAVEGAÇÃO)
+   ========================================================================== */
+.stage {
+    position: absolute;
+    width: 100%;
+    max-width: 1200px;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    padding: 20px;
+    transition: opacity 1s cubic-bezier(0.4, 0, 0.2, 1),
+                filter 1s cubic-bezier(0.4, 0, 0.2, 1),
+                transform 1s cubic-bezier(0.4, 0, 0.2, 1);
+    opacity: 1;
+    filter: blur(0px);
+    transform: scale(1) translateY(0);
+    pointer-events: auto;
+    overflow-y: auto;
+    scrollbar-width: none;
+}
+.stage::-webkit-scrollbar {
+    display: none;
+}
+
+.stage.hidden {
+    opacity: 0;
+    filter: blur(20px);
+    transform: scale(0.95) translateY(15px);
+    pointer-events: none;
+}
+
+/* ==========================================================================
+   COMPONENTES COMUNS
+   ========================================================================== */
+/* Cartão de Vidro (Glassmorphism) */
+.glass-card {
+    background: var(--glass-bg);
+    border: 1px solid var(--glass-border);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    border-radius: 24px;
+    padding: 40px;
+    box-shadow: 0 20px 50px var(--glass-shadow), 
+                inset 0 1px 0 rgba(255, 255, 255, 0.1);
+    max-width: 500px;
+    width: 100%;
+    text-align: center;
+    transition: var(--transition-glass);
+}
+.glass-card:hover {
+    border-color: rgba(255, 255, 255, 0.15);
+    box-shadow: 0 25px 60px rgba(0, 0, 0, 0.6), 
+                inset 0 1px 0 rgba(255, 255, 255, 0.15);
+    transform: translateY(-2px);
+}
+
+/* Botões */
+.btn {
+    position: relative;
+    padding: 14px 32px;
+    font-size: 1rem;
+    font-weight: 500;
+    color: #fff;
+    background: transparent;
+    border: none;
+    border-radius: 50px;
+    cursor: pointer;
+    outline: none;
+    overflow: hidden;
+    transition: transform 0.4s cubic-bezier(0.34, 1.56, 0.64, 1),
+                box-shadow 0.4s ease,
+                border-color 0.4s ease;
+    z-index: 1;
+    display: inline-flex;
+    justify-content: center;
+    align-items: center;
+    letter-spacing: 0.01em;
+}
+.btn::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(45deg, var(--color-accent-pink), var(--color-accent-purple));
+    z-index: -1;
+    transition: filter 0.4s ease;
+}
+.btn:hover::before {
+    filter: brightness(1.2);
+}
+.btn:hover {
+    transform: translateY(-3px);
+}
+.btn:active {
+    transform: translateY(-1px);
+}
+
+.btn-glow {
+    box-shadow: 0 0 20px rgba(255, 117, 143, 0.4);
+}
+.btn-glow:hover {
+    box-shadow: 0 0 35px rgba(255, 117, 143, 0.8),
+                0 0 15px rgba(192, 132, 252, 0.6);
+}
+
+.btn-secondary {
+    border: 1px solid var(--glass-border);
+}
+.btn-secondary::before {
+    background: rgba(255, 255, 255, 0.05);
+}
+.btn-secondary:hover::before {
+    background: rgba(255, 255, 255, 0.12);
+}
+.btn-secondary:hover {
+    border-color: rgba(255, 255, 255, 0.3);
+    box-shadow: 0 0 20px rgba(255, 255, 255, 0.1);
+}
+
+/* Títulos Seção */
+.section-title {
+    font-family: var(--font-heading);
+    font-size: 2.2rem;
+    font-weight: 600;
+    margin-bottom: 8px;
+    color: var(--color-accent-pink);
+    text-shadow: 0 2px 10px rgba(255, 117, 143, 0.2);
+    letter-spacing: 0.02em;
+    font-feature-settings: "liga" 1, "kern" 1;
+}
+.section-subtitle {
+    font-size: 1rem;
+    color: var(--color-text-sub);
+    margin-bottom: 30px;
+    letter-spacing: 0.01em;
+    font-weight: 300;
+}
+
+/* ==========================================================================
+   ETAPA 1: TELA INICIAL
+   ========================================================================== */
+.pre-title {
+    font-family: var(--font-handwritten);
+    font-size: 2.5rem;
+    color: var(--color-accent-pink);
+    margin-bottom: 10px;
+    opacity: 0.9;
+    letter-spacing: 0.02em;
+}
+.main-title {
+    font-family: var(--font-heading);
+    font-size: 2.4rem;
+    font-weight: 400;
+    line-height: 1.3;
+    margin-bottom: 35px;
+    letter-spacing: 0.01em;
+    font-feature-settings: "liga" 1, "kern" 1;
+}
+
+/* Animação fade-in suave */
+.fade-in {
+    animation: fadeIn 1.5s ease-out forwards;
+}
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* ==========================================================================
+   ETAPA 2: PRESENTE 3D
+   ========================================================================== */
+.gift-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    perspective: 1200px;
+}
+.gift-hint {
+    font-size: 1.1rem;
+    color: var(--color-accent-gold);
+    margin-bottom: 40px;
+    text-shadow: 0 0 10px rgba(252, 211, 77, 0.3);
+    letter-spacing: 0.02em;
+    font-weight: 300;
+}
+
+/* Cena 3D */
+.gift-scene {
+    position: relative;
+    width: 200px;
+    height: 200px;
+    transform-style: preserve-3d;
+    transform: rotateX(-20deg) rotateY(35deg);
+    transition: transform 1s cubic-bezier(0.25, 1, 0.5, 1);
+}
+
+.gift-box {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    transform-style: preserve-3d;
+    cursor: pointer;
+    /* Balanço suave contínuo */
+    animation: idleSwing 4s ease-in-out infinite;
+}
+
+.gift-face {
+    position: absolute;
+    width: 200px;
+    height: 200px;
+    background: linear-gradient(135deg, #cc2b5e, #753a88);
+    border: 2px solid rgba(255, 255, 255, 0.15);
+    box-shadow: inset 0 0 40px rgba(0, 0, 0, 0.4);
+}
+
+/* Cruzetas de Fita Dourada */
+.gift-face::before, .gift-face::after {
+    content: '';
+    position: absolute;
+    background: linear-gradient(to right, #ffe066, #fcd34d, #d9a707);
+    box-shadow: 0 0 10px rgba(252, 211, 77, 0.5);
+}
+/* Fita Vertical */
+.gift-face::before {
+    left: 85px;
+    width: 30px;
+    height: 100%;
+}
+/* Fita Horizontal (exceto topo) */
+.gift-face:not(.top-lid)::after {
+    top: 85px;
+    width: 100%;
+    height: 30px;
+}
+
+/* Posicionamento 3D das Faces */
+.front  { transform: rotateY(0deg) translateZ(100px); }
+.back   { transform: rotateY(180deg) translateZ(100px); }
+.left   { transform: rotateY(-90deg) translateZ(100px); }
+.right  { transform: rotateY(90deg) translateZ(100px); }
+.bottom { transform: rotateX(-90deg) translateZ(100px); background: #52165c; }
+
+/* Tampa do Presente */
+.top-lid {
+    transform: rotateX(90deg) translateZ(105px);
+    width: 210px;
+    height: 210px;
+    left: -5px;
+    top: -5px;
+    background: linear-gradient(135deg, #d33c73, #86469c);
+    transform-style: preserve-3d;
+    transition: transform 1.5s cubic-bezier(0.25, 1, 0.5, 1);
+    box-shadow: 0 5px 15px rgba(0,0,0,0.5);
+}
+.top-lid::before {
+    left: 90px;
+    width: 30px;
+}
+.top-lid::after {
+    top: 90px;
+    height: 30px;
+    width: 100%;
+}
+
+/* Laço da Fita Tridimensional */
+.ribbon-bow {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 60px;
+    height: 60px;
+    transform: translate(-50%, -50%) translateZ(10px);
+    transform-style: preserve-3d;
+}
+.ribbon-bow::before, .ribbon-bow::after {
+    content: '';
+    position: absolute;
+    width: 50px;
+    height: 30px;
+    background: linear-gradient(135deg, #fcd34d, #d9a707);
+    border-radius: 50%;
+    box-shadow: 0 5px 10px rgba(0,0,0,0.3);
+}
+.ribbon-bow::before {
+    transform: rotate(45deg) translate(-10px, -5px);
+}
+.ribbon-bow::after {
+    transform: rotate(-45deg) translate(10px, -5px);
+}
+
+/* Brilho de Luz Interno */
+.gift-light {
+    position: absolute;
+    width: 180px;
+    height: 180px;
+    left: 10px;
+    top: 10px;
+    border-radius: 50%;
+    background: radial-gradient(circle, rgba(255,255,255,1) 0%, rgba(252,211,77,0.8) 40%, rgba(255,117,143,0) 70%);
+    transform: rotateX(90deg) translateZ(0);
+    opacity: 0;
+    filter: blur(10px);
+    transition: all 1s ease-out;
+    pointer-events: none;
+}
+
+/* Animações da Caixa */
+@keyframes idleSwing {
+    0%, 100% { transform: rotateY(0deg) translateY(0); }
+    50% { transform: rotateY(5deg) translateY(-8px) rotateX(-2deg); }
+}
+
+@keyframes boxShake {
+    0%, 100% { transform: rotateX(-20deg) rotateY(35deg); }
+    10%, 30%, 50%, 70%, 90% { transform: rotateX(-20deg) rotateY(32deg) rotateZ(-2deg); }
+    20%, 40%, 60%, 80% { transform: rotateX(-20deg) rotateY(38deg) rotateZ(2deg); }
+}
+.gift-scene.shake {
+    animation: boxShake 0.6s ease-in-out;
+}
+
+/* Efeito de abertura (gatilho via JS) */
+.gift-scene.open .top-lid {
+    transform: rotateX(110deg) translateZ(300px) translateY(-200px) rotateY(45deg);
+    opacity: 0;
+}
+.gift-scene.open .gift-light {
+    opacity: 1;
+    transform: rotateX(90deg) translateZ(50px) scale(2.5);
+    filter: blur(5px);
+}
+.gift-scene.open {
+    transform: rotateX(-10deg) rotateY(15deg) scale(1.4);
+}
+
+/* ==========================================================================
+   ETAPA 3: CONTAGEM REGRESSIVA
+   ========================================================================== */
+.countdown-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 100%;
+    height: 100%;
+}
+.countdown-number {
+    font-family: var(--font-heading);
+    font-size: 10rem;
+    font-weight: 700;
+    color: var(--color-accent-pink);
+    text-shadow: 0 0 40px rgba(255, 117, 143, 0.6),
+                 0 0 80px rgba(192, 132, 252, 0.4);
+    opacity: 0;
+    transform: scale(0.2);
+    filter: blur(15px);
+    letter-spacing: 0.02em;
+    font-feature-settings: "liga" 1, "kern" 1;
+}
+
+.countdown-number.impact {
+    animation: numberImpact 1s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
+}
+
+@keyframes numberImpact {
+    0% {
+        opacity: 0;
+        transform: scale(0.2);
+        filter: blur(20px);
+    }
+    30% {
+        opacity: 1;
+        transform: scale(1.1);
+        filter: blur(0px);
+    }
+    50% {
+        transform: scale(1.0);
+    }
+    90% {
+        opacity: 1;
+        transform: scale(1.0);
+        filter: blur(0px);
+    }
+    100% {
+        opacity: 0;
+        transform: scale(1.5);
+        filter: blur(10px);
+    }
+}
+
+/* ==========================================================================
+   ETAPA 4: FELIZ ANIVERSÁRIO
+   ========================================================================== */
+.birthday-title {
+    font-family: var(--font-heading);
+    font-size: 2.8rem;
+    font-weight: 700;
+    margin-bottom: 25px;
+    color: var(--color-accent-pink);
+    letter-spacing: 0.02em;
+    font-feature-settings: "liga" 1, "kern" 1;
+}
+.birthday-text {
+    font-size: 1.15rem;
+    line-height: 1.7;
+    margin-bottom: 20px;
+    color: var(--color-text-main);
+    font-weight: 300;
+    letter-spacing: 0.01em;
+}
+.birthday-subtext {
+    font-size: 0.95rem;
+    color: var(--color-text-sub);
+    margin-bottom: 35px;
+    font-style: italic;
+    font-weight: 300;
+}
+
+/* Glow Animação Contínua */
+.animate-glow {
+    animation: titleGlow 3s ease-in-out infinite alternate;
+}
+@keyframes titleGlow {
+    from {
+        text-shadow: 0 0 10px rgba(255, 117, 143, 0.3), 0 0 20px rgba(255, 117, 143, 0.1);
+    }
+    to {
+        text-shadow: 0 0 20px rgba(255, 117, 143, 0.6), 0 0 40px rgba(192, 132, 252, 0.5), 0 0 60px rgba(252, 211, 77, 0.3);
+    }
+}
+
+/* ==========================================================================
+   ETAPA 5: MURAL DE POLAROIDS (SCRAPBOOK)
+   ========================================================================== */
+#stage-5 {
+    justify-content: flex-start;
+    padding-top: 60px;
+}
+.mural-header {
+    text-align: center;
+    margin-bottom: 40px;
+    width: 100%;
+}
+.mural-container {
+    position: relative;
+    width: 100%;
+    max-width: 900px;
+    height: 480px;
+    margin: 0 auto;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.polaroid {
+    position: absolute;
+    background-color: #fcfcf9;
+    padding: 14px 14px 30px 14px;
+    border-radius: 2px;
+    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.4), 
+                0 1px 3px rgba(0, 0, 0, 0.2);
+    width: 210px;
+    color: #2b2b2b;
+    transform: rotate(var(--rotation)) scale(0.6) translateY(100px);
+    opacity: 0;
+    transition: transform 0.9s cubic-bezier(0.175, 0.885, 0.32, 1.275),
+                opacity 0.9s ease;
+    z-index: 10;
+}
+
+.polaroid.throw {
+    opacity: 1;
+    transform: rotate(var(--rotation)) scale(1) translateY(0);
+    transition-delay: var(--delay);
+}
+
+.polaroid:hover {
+    z-index: 50;
+    transform: rotate(0deg) scale(1.08);
+    box-shadow: 0 15px 35px rgba(0, 0, 0, 0.5);
+    transition: transform 0.4s cubic-bezier(0.34, 1.56, 0.64, 1),
+                box-shadow 0.4s ease;
+}
+
+/* Fita Adesiva Texturizada */
+.tape {
+    position: absolute;
+    top: -18px;
+    left: 50%;
+    transform: translateX(-50%) rotate(calc(var(--rotation) * -0.5));
+    width: 85px;
+    height: 24px;
+    background: rgba(200, 200, 180, 0.25); /* Translúcida e texturizada */
+    background-color: rgba(255, 255, 255, 0.25);
+    backdrop-filter: blur(2px);
+    -webkit-backdrop-filter: blur(2px);
+    border-left: 1px dashed rgba(0,0,0,0.05);
+    border-right: 1px dashed rgba(0,0,0,0.05);
+    box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+}
+
+.polaroid-img-wrapper {
+    width: 100%;
+    height: 182px;
+    background-color: #111;
+    overflow: hidden;
+    border: 1px solid rgba(0, 0, 0, 0.05);
+}
+.placeholder-svg,
+.polaroid-img-wrapper img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+}
+
+.polaroid-caption {
+    font-family: var(--font-handwritten);
+    font-size: 1.6rem;
+    text-align: center;
+    margin-top: 12px;
+    line-height: 1.1;
+    color: #333333;
+    letter-spacing: 0.01em;
+}
+
+/* Posicionamento Espalhado das Polaroids (Grid Relativo em Telas Grandes) */
+.mural-container .polaroid:nth-child(1) { left: 8%; top: 10%; }
+.mural-container .polaroid:nth-child(2) { left: 52%; top: 5%; }
+.mural-container .polaroid:nth-child(3) { left: 28%; top: 48%; }
+.mural-container .polaroid:nth-child(4) { left: 68%; top: 42%; }
+
+.mural-footer {
+    margin-top: 40px;
+    text-align: center;
+    width: 100%;
+}
+
+/* Responsividade do Mural */
+@media (max-width: 768px) {
+    .mural-container {
+        height: auto;
+        display: grid;
+        grid-template-columns: repeat(2, 1fr);
+        gap: 30px;
+        padding: 20px;
+        justify-items: center;
+    }
+    .polaroid {
+        position: relative !important;
+        left: auto !important;
+        top: auto !important;
+        transform: rotate(var(--rotation)) scale(0.9);
+        width: 100%;
+        max-width: 165px;
+    }
+    .polaroid-img-wrapper {
+        height: 135px;
+    }
+    .polaroid-caption {
+        font-size: 1.4rem;
+    }
+}
+
+/* ==========================================================================
+   ETAPA 6: LINHA DO TEMPO (TIMELINE)
+   ========================================================================== */
+#stage-6 {
+    justify-content: flex-start;
+    padding-top: 60px;
+}
+.timeline-container {
+    position: relative;
+    max-width: 800px;
+    width: 100%;
+    margin: 40px auto;
+    padding: 0 20px;
+}
+
+/* Linha central */
+.timeline-line {
+    position: absolute;
+    left: 50%;
+    top: 0;
+    bottom: 0;
+    width: 2px;
+    background: linear-gradient(to bottom, 
+                var(--color-accent-pink), 
+                var(--color-accent-purple), 
+                var(--color-accent-blue));
+    transform: translateX(-50%);
+    opacity: 0.3;
+}
+
+.timeline-item {
+    position: relative;
+    width: 50%;
+    margin-bottom: 30px;
+    opacity: 0;
+    transform: translateY(30px);
+    transition: opacity 0.8s cubic-bezier(0.4, 0, 0.2, 1),
+                transform 0.8s cubic-bezier(0.4, 0, 0.2, 1);
+}
+.timeline-item.show {
+    opacity: 1;
+    transform: translateY(0);
+    transition-delay: calc(var(--index) * 0.2s);
+}
+
+.timeline-item:nth-child(odd) {
+    left: 0;
+    padding-right: 40px;
+    text-align: right;
+}
+.timeline-item:nth-child(even) {
+    left: 50%;
+    padding-left: 40px;
+}
+
+/* Ponto da Linha */
+.timeline-dot {
+    position: absolute;
+    top: 25px;
+    width: 16px;
+    height: 16px;
+    border-radius: 50%;
+    background-color: var(--color-accent-pink);
+    border: 3px solid var(--color-bg-deep);
+    box-shadow: 0 0 10px var(--color-accent-pink);
+    transition: var(--transition-smooth);
+    z-index: 12;
+}
+.timeline-item:nth-child(odd) .timeline-dot {
+    right: -8px;
+}
+.timeline-item:nth-child(even) .timeline-dot {
+    left: -8px;
+}
+
+.timeline-item:hover .timeline-dot {
+    transform: scale(1.3);
+    background-color: #fff;
+    box-shadow: 0 0 15px #fff, 0 0 30px var(--color-accent-pink);
+}
+
+/* Conteúdo */
+.timeline-content {
+    cursor: pointer;
+    padding: 20px;
+    text-align: inherit;
+    transition: var(--transition-elastic);
+}
+.timeline-content h3 {
+    font-size: 1.15rem;
+    font-weight: 600;
+    color: var(--color-accent-pink);
+    transition: var(--transition-smooth);
+    letter-spacing: 0.01em;
+}
+.timeline-content:hover h3 {
+    color: #fff;
+}
+
+.timeline-body {
+    margin-top: 15px;
+    font-size: 0.95rem;
+    line-height: 1.6;
+    color: var(--color-text-sub);
+    display: none; /* Controlado via JS */
+}
+
+.timeline-body.active {
+    display: block;
+    animation: dropdown 0.4s ease-out forwards;
+}
+
+@keyframes dropdown {
+    from {
+        opacity: 0;
+        transform: translateY(-10px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.timeline-footer {
+    margin-top: 30px;
+    width: 100%;
+}
+
+/* Responsividade Timeline */
+@media (max-width: 768px) {
+    .timeline-line {
+        left: 28px;
+    }
+    .timeline-item {
+        width: 100% !important;
+        left: 0 !important;
+        padding-left: 55px !important;
+        padding-right: 0 !important;
+        text-align: left !important;
+    }
+    .timeline-dot {
+        left: 20px !important;
+    }
+}
+
+/* ==========================================================================
+   ETAPA 7: CARTA & ENVELOPE
+   ========================================================================== */
+.letter-scene {
+    position: relative;
+    width: 100%;
+    max-width: 600px;
+    height: 100%;
+    min-height: 500px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    perspective: 1500px;
+}
+
+.letter-instruction {
+    margin-top: 40px;
+    font-size: 1rem;
+    color: var(--color-accent-pink);
+    text-shadow: 0 0 10px rgba(255, 117, 143, 0.2);
+}
+
+.envelope {
+    position: relative;
+    width: 320px;
+    height: 220px;
+    background: #c54a64;
+    border-radius: 6px;
+    box-shadow: 0 15px 35px rgba(0, 0, 0, 0.5);
+    cursor: pointer;
+    transform-style: preserve-3d;
+    transition: transform 1s cubic-bezier(0.25, 1, 0.5, 1);
+}
+
+/* Aba superior do envelope */
+.envelope-flap {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 0;
+    height: 0;
+    border-left: 160px solid transparent;
+    border-right: 160px solid transparent;
+    border-top: 120px solid #d35570;
+    transform-origin: top;
+    transition: transform 0.7s cubic-bezier(0.4, 0, 0.2, 1),
+                z-index 0.7s;
+    z-index: 30;
+}
+
+/* Bolso / Laterais do envelope */
+.envelope-pocket {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    width: 0;
+    height: 0;
+    border-left: 160px solid #9e364c;
+    border-right: 160px solid #9e364c;
+    border-bottom: 120px solid #b33e56;
+    border-top: 100px solid transparent;
+    border-radius: 0 0 6px 6px;
+    z-index: 20;
+}
+
+/* Papel de Carta */
+.envelope-paper {
+    position: absolute;
+    bottom: 10px;
+    left: 15px;
+    width: 290px;
+    height: 200px;
+    background-color: #faf8f5;
+    background-image: linear-gradient(rgba(0, 0, 0, 0.05) 1px, transparent 1px);
+    background-size: 100% 24px;
+    border-radius: 4px;
+    padding: 20px;
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.15);
+    transition: transform 0.9s cubic-bezier(0.25, 1, 0.5, 1),
+                height 0.9s cubic-bezier(0.25, 1, 0.5, 1),
+                width 0.9s cubic-bezier(0.25, 1, 0.5, 1),
+                left 0.9s cubic-bezier(0.25, 1, 0.5, 1),
+                z-index 0.9s;
+    z-index: 15;
+    overflow: hidden;
+}
+
+.paper-content {
+    width: 100%;
+    height: 100%;
+    color: #2b2b2b;
+    opacity: 0.8;
+    transition: opacity 0.5s ease;
+}
+
+.handwritten-title {
+    font-family: var(--font-handwritten);
+    font-size: 2.2rem;
+    text-align: center;
+    color: #9e364c;
+    margin-bottom: 15px;
+    line-height: 1.1;
+}
+
+.scrollable-letter-text {
+    height: calc(100% - 60px);
+    overflow-y: auto;
+    font-size: 0.95rem;
+    line-height: 1.5;
+    font-style: italic;
+    scrollbar-width: thin;
+}
+.scrollable-letter-text p {
+    margin-bottom: 12px;
+}
+.letter-sign {
+    margin-top: 20px;
+    font-family: var(--font-handwritten);
+    font-size: 1.8rem;
+    color: #9e364c;
+    margin-bottom: 0 !important;
+}
+.letter-sign-name {
+    font-weight: 600;
+}
+
+/* Animações e Classes de abertura */
+.envelope.open .envelope-flap {
+    transform: rotateX(180deg);
+    z-index: 10;
+}
+
+.envelope.open .envelope-paper {
+    transform: translateY(-100px);
+    height: 400px;
+    width: 380px;
+    left: -30px;
+    z-index: 40;
+    box-shadow: 0 20px 45px rgba(0, 0, 0, 0.6);
+}
+
+.envelope.open .paper-content {
+    opacity: 1;
+}
+
+.envelope.open {
+    transform: translateY(120px);
+    cursor: default;
+}
+
+#btn-close-letter {
+    position: absolute;
+    bottom: -60px;
+    z-index: 100;
+}
+
+/* Responsividade Carta */
+@media (max-width: 500px) {
+    .envelope {
+        width: 280px;
+        height: 190px;
+    }
+    .envelope-flap {
+        border-left-width: 140px;
+        border-right-width: 140px;
+        border-top-width: 105px;
+    }
+    .envelope-pocket {
+        border-left-width: 140px;
+        border-right-width: 140px;
+        border-bottom-width: 105px;
+        border-top-width: 85px;
+    }
+    .envelope-paper {
+        width: 256px;
+        height: 170px;
+        left: 12px;
+        bottom: 8px;
+    }
+    .envelope.open .envelope-paper {
+        width: 290px;
+        height: 370px;
+        left: -5px;
+        transform: translateY(-120px);
+    }
+    .envelope.open {
+        transform: translateY(140px);
+    }
+}
+
+/* ==========================================================================
+   ETAPA 8: CÉU ESTRELADO ESPECIAL
+   ========================================================================== */
+.sky-instruction {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 90%;
+    max-width: 600px;
+    text-align: center;
+    z-index: 10;
+    pointer-events: none;
+}
+.sky-text-overlay {
+    font-family: var(--font-heading);
+    font-size: 2.2rem;
+    font-weight: 600;
+    color: #fff;
+    opacity: 0;
+    transition: opacity 1.5s cubic-bezier(0.4, 0, 0.2, 1);
+    text-shadow: 0 0 15px rgba(255,255,255,0.6), 
+                 0 0 30px var(--color-accent-blue);
+    letter-spacing: 0.02em;
+}
+.sky-text-overlay.show {
+    opacity: 1;
+}
+
+/* ==========================================================================
+   ETAPA 9: FRASES SURPRESA
+   ========================================================================== */
+.boxes-container {
+    display: flex;
+    gap: 25px;
+    justify-content: center;
+    flex-wrap: wrap;
+    width: 100%;
+    max-width: 900px;
+    margin: 40px auto;
+}
+
+.box-btn {
+    flex: 1 1 250px;
+    max-width: 280px;
+    height: 180px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    padding: 30px;
+    cursor: pointer;
+    border-radius: 20px;
+    text-align: center;
+    transition: transform 0.5s cubic-bezier(0.34, 1.56, 0.64, 1),
+                border-color 0.4s ease,
+                box-shadow 0.4s ease;
+}
+.box-btn:hover {
+    transform: translateY(-8px) scale(1.03);
+    border-color: rgba(255, 117, 143, 0.3);
+    box-shadow: 0 20px 40px rgba(255, 117, 143, 0.15);
+}
+
+.box-icon {
+    font-size: 2.5rem;
+    margin-bottom: 15px;
+    filter: drop-shadow(0 0 8px rgba(255, 255, 255, 0.2));
+    transition: var(--transition-smooth);
+}
+.box-btn:hover .box-icon {
+    transform: scale(1.2);
+}
+
+.box-text {
+    font-size: 1.1rem;
+    font-weight: 500;
+    color: var(--color-text-main);
+}
+
+/* Modal Glassmorphic */
+.modal {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(5, 5, 15, 0.7);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    z-index: 1100;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    transition: opacity 0.5s ease;
+}
+.modal.hidden {
+    opacity: 0;
+    pointer-events: none;
+}
+
+.modal-content {
+    position: relative;
+    max-width: 480px;
+    width: 90%;
+    padding: 45px 35px 35px 35px;
+    transform: scale(0.85);
+    transition: transform 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+.modal:not(.hidden) .modal-content {
+    transform: scale(1);
+}
+
+.close-modal {
+    position: absolute;
+    top: 15px;
+    right: 20px;
+    font-size: 2rem;
+    cursor: pointer;
+    color: var(--color-text-sub);
+    transition: var(--transition-smooth);
+}
+.close-modal:hover {
+    color: var(--color-accent-pink);
+    transform: rotate(90deg);
+}
+
+.modal-message-title {
+    font-family: var(--font-heading);
+    font-size: 1.8rem;
+    color: var(--color-accent-pink);
+    margin-bottom: 20px;
+}
+.modal-message-body {
+    font-size: 1.05rem;
+    line-height: 1.6;
+    color: var(--color-text-main);
+}
+
+.boxes-footer {
+    margin-top: 30px;
+    width: 100%;
+}
+
+/* ==========================================================================
+   ETAPA 10: BOLO DE ANIVERSÁRIO (CSS ART)
+   ========================================================================== */
+.cake-container {
+    position: relative;
+    width: 300px;
+    height: 350px;
+    margin: 40px auto;
+    display: flex;
+    justify-content: center;
+    align-items: flex-end;
+}
+
+.cake {
+    position: relative;
+    width: 250px;
+    transform-style: preserve-3d;
+}
+
+.plate {
+    width: 270px;
+    height: 15px;
+    background: linear-gradient(to bottom, #f3f4f6, #d1d5db);
+    border-radius: 50%;
+    position: absolute;
+    bottom: -10px;
+    left: -10px;
+    box-shadow: 0 10px 20px rgba(0,0,0,0.5);
+    z-index: 1;
+}
+
+/* Camadas do Bolo */
+.layer {
+    height: 50px;
+    border-radius: 50%;
+    position: relative;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+
+.layer-bottom {
+    width: 250px;
+    height: 60px;
+    background: linear-gradient(to bottom, #86469c, #bc7fcd);
+    z-index: 2;
+    margin-bottom: -15px;
+}
+
+.layer-middle {
+    width: 210px;
+    height: 55px;
+    background: linear-gradient(to bottom, #ff758f, #ff7eb3);
+    z-index: 4;
+    left: 20px;
+    margin-bottom: -15px;
+}
+
+.layer-top {
+    width: 170px;
+    height: 50px;
+    background: linear-gradient(to bottom, #ffe066, #fcd34d);
+    z-index: 6;
+    left: 40px;
+}
+
+/* Cobertura pingando */
+.icing {
+    position: absolute;
+    width: 172px;
+    height: 30px;
+    background: #ffffff;
+    border-radius: 50%;
+    top: 0;
+    left: 39px;
+    z-index: 7;
+}
+
+.drips {
+    position: absolute;
+    top: 15px;
+    left: 44px;
+    width: 162px;
+    height: 20px;
+    z-index: 8;
+    display: flex;
+    justify-content: space-around;
+}
+
+.drip {
+    width: 12px;
+    height: 15px;
+    background: #ffffff;
+    border-radius: 0 0 10px 10px;
+}
+.drip:nth-child(2) { height: 22px; width: 14px; }
+.drip:nth-child(3) { height: 12px; }
+.drip:nth-child(4) { height: 18px; width: 10px; }
+
+/* Velas */
+.candles {
+    position: absolute;
+    width: 130px;
+    height: 80px;
+    top: -45px;
+    left: 60px;
+    z-index: 10;
+    display: flex;
+    justify-content: space-around;
+    align-items: flex-end;
+}
+
+.candle {
+    position: relative;
+    width: 12px;
+    height: 50px;
+    background: linear-gradient(to right, #60a5fa, #93c5fd, #60a5fa);
+    background-size: 10px 50px;
+    border-radius: 3px 3px 0 0;
+}
+.candle::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(45deg, transparent 45%, #ffffff 50%, transparent 55%);
+    background-size: 100% 12px;
+}
+
+.wick {
+    position: absolute;
+    top: -8px;
+    left: 5px;
+    width: 2px;
+    height: 8px;
+    background-color: #374151;
+}
+
+/* Chama da Vela */
+.flame {
+    position: absolute;
+    top: -24px;
+    left: 0;
+    width: 12px;
+    height: 18px;
+    background: radial-gradient(ellipse at bottom, #fcd34d 0%, #f97316 40%, rgba(239,68,68,0) 80%);
+    border-radius: 50% 50% 20% 20% / 60% 60% 40% 40%;
+    box-shadow: 0 0 10px rgba(252, 211, 77, 0.8),
+                0 0 20px rgba(249, 115, 22, 0.4);
+    transform-origin: center bottom;
+    animation: flicker 1.5s ease-in-out infinite alternate;
+    cursor: pointer;
+    transition: opacity 0.3s ease, transform 0.3s ease;
+}
+
+@keyframes flicker {
+    0% { transform: scale(1) rotate(-1deg); }
+    20% { transform: scale(0.9) rotate(1deg); }
+    40% { transform: scale(1.05) rotate(-0.5deg) skewX(-2deg); }
+    60% { transform: scale(0.95) rotate(1.5deg) skewX(2deg); }
+    80% { transform: scale(1.02) rotate(-1.5deg); }
+    100% { transform: scale(0.98) rotate(0.5deg); }
+}
+
+/* Velas apagadas */
+.candle.blown-out .flame {
+    opacity: 0;
+    transform: scale(0);
+    pointer-events: none;
+}
+
+/* Fumaça da vela apagada */
+.smoke {
+    position: absolute;
+    top: -25px;
+    left: 2px;
+    width: 8px;
+    height: 8px;
+    background-color: rgba(220,220,220,0.5);
+    border-radius: 50%;
+    filter: blur(2px);
+    opacity: 0;
+    pointer-events: none;
+}
+.candle.blown-out .smoke {
+    animation: smokeRise 1.8s ease-out forwards;
+}
+
+@keyframes smokeRise {
+    0% {
+        opacity: 0.8;
+        transform: translateY(0) scale(0.8);
+    }
+    40% {
+        opacity: 0.5;
+        transform: translateY(-20px) translateX(-5px) scale(1.5);
+    }
+    80% {
+        opacity: 0.15;
+        transform: translateY(-45px) translateX(8px) scale(2.2);
+    }
+    100% {
+        opacity: 0;
+        transform: translateY(-60px) translateX(-2px) scale(3);
+    }
+}
+
+.cake-footer {
+    margin-top: 30px;
+    width: 100%;
+}
+
+/* ==========================================================================
+   ETAPA FINAL
+   ========================================================================== */
+.final-container {
+    width: 100%;
+    max-width: 750px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    text-align: center;
+    padding-bottom: 160px;
+}
+
+/* Coração Neon Pulsante */
+.neon-heart-wrapper {
+    width: 120px;
+    height: 120px;
+    margin-bottom: 50px;
+}
+.neon-heart {
+    width: 100%;
+    height: 100%;
+    fill: none;
+    stroke: var(--color-heart);
+    stroke-width: 1.5px;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+    filter: drop-shadow(0 0 8px rgba(239, 68, 68, 0.5))
+            drop-shadow(0 0 15px rgba(239, 68, 68, 0.3));
+    animation: neonPulse 1.8s ease-in-out infinite alternate;
+}
+
+@keyframes neonPulse {
+    from {
+        transform: scale(0.9);
+        filter: drop-shadow(0 0 8px rgba(239, 68, 68, 0.4))
+                drop-shadow(0 0 12px rgba(239, 68, 68, 0.2));
+    }
+    to {
+        transform: scale(1.15);
+        filter: drop-shadow(0 0 15px rgba(239, 68, 68, 0.9))
+                drop-shadow(0 0 30px rgba(239, 68, 68, 0.6))
+                drop-shadow(0 0 45px rgba(239, 68, 68, 0.4));
+    }
+}
+
+/* Textos da Etapa Final */
+.final-texts-wrapper {
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0;
+}
+
+/* Caixa com altura fixa que contém os textos sequenciais que aparecem e somem */
+.sequential-texts-box {
+    position: relative;
+    width: 100%;
+    min-height: 140px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.final-text {
+    font-family: var(--font-heading);
+    font-size: 1.55rem;
+    line-height: 1.6;
+    font-weight: 400;
+    color: var(--color-text-main);
+    text-shadow: 0 2px 10px rgba(255,255,255,0.1);
+    position: absolute;
+    width: 100%;
+    opacity: 0;
+    filter: blur(8px);
+    transition: opacity 1.5s cubic-bezier(0.4, 0, 0.2, 1),
+                filter 1.5s cubic-bezier(0.4, 0, 0.2, 1),
+                transform 1.5s cubic-bezier(0.4, 0, 0.2, 1);
+    transform: translateY(15px);
+    letter-spacing: 0.01em;
+}
+.final-text.show {
+    opacity: 1;
+    filter: blur(0px);
+    transform: translateY(0);
+}
+
+.final-text-title {
+    font-family: var(--font-heading);
+    font-size: 3rem;
+    font-weight: 700;
+    color: var(--color-accent-pink);
+    text-shadow: 0 0 25px rgba(255, 117, 143, 0.7),
+                 0 0 50px rgba(192, 132, 252, 0.4);
+    position: absolute;
+    width: 100%;
+    opacity: 0;
+    filter: blur(10px);
+    transition: opacity 2s cubic-bezier(0.4, 0, 0.2, 1),
+                filter 2s cubic-bezier(0.4, 0, 0.2, 1),
+                transform 2s cubic-bezier(0.4, 0, 0.2, 1);
+    transform: scale(0.9);
+    letter-spacing: 0.02em;
+    font-feature-settings: "liga" 1, "kern" 1;
+}
+.final-text-title.show {
+    opacity: 1;
+    filter: blur(0px);
+    transform: scale(1);
+    animation: finalTitleGlow 3s ease-in-out infinite alternate;
+}
+
+@keyframes finalTitleGlow {
+    from {
+        text-shadow: 0 0 20px rgba(255, 117, 143, 0.6), 0 0 40px rgba(192, 132, 252, 0.3);
+    }
+    to {
+        text-shadow: 0 0 35px rgba(255, 117, 143, 0.9), 0 0 70px rgba(192, 132, 252, 0.6), 0 0 100px rgba(252, 211, 77, 0.4);
+    }
+}
+
+/* ==========================================================================
+   ENCERRAMENTO ESPECIAL
+   ========================================================================== */
+
+/* Container do encerramento */
+.special-ending {
+    width: 100%;
+    margin-top: 2.5rem;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 1.2rem;
+    opacity: 0;
+    transition: opacity 1.5s ease;
+}
+.special-ending.show {
+    opacity: 1;
+}
+
+/* Texto "Feito com muito carinho..." */
+.ending-text {
+    font-family: var(--font-serif);
+    font-style: italic;
+    font-size: 1.15rem;
+    color: rgba(255, 255, 255, 0.75);
+    text-align: center;
+    letter-spacing: 0.04em;
+    opacity: 0;
+    transform: translateY(12px);
+    transition: opacity 1.8s ease, transform 1.8s ease;
+}
+.ending-text.show {
+    opacity: 1;
+    transform: translateY(0);
+}
+
+/* Assinatura com efeito de escrita */
+.handwritten-signature {
+    font-family: var(--font-handwritten);
+    font-size: 2.2rem;
+    background: linear-gradient(135deg, #ff758f, #c084fc, #fcd34d);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    text-align: center;
+    position: relative;
+    max-width: 0;
+    opacity: 0;
+    transition: opacity 0.5s ease;
+}
+.handwritten-signature.show {
+    opacity: 1;
+    max-width: 100%;
+    animation: typewriterExpand 2.8s cubic-bezier(0.4, 0, 0.2, 1) forwards,
+               signatureGlow 3s 2.8s ease-in-out infinite alternate;
+}
+@keyframes typewriterExpand {
+    from { max-width: 0; }
+    to   { max-width: 600px; }
+}
+@keyframes signatureGlow {
+    from { filter: drop-shadow(0 0 8px rgba(255, 117, 143, 0.5)); }
+    to   { filter: drop-shadow(0 0 22px rgba(192, 132, 252, 0.9)); }
+}
+
+/* Estrelinhas ao redor da assinatura */
+.handwritten-signature.show::before,
+.handwritten-signature.show::after {
+    content: '✦';
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+    font-size: 1rem;
+    -webkit-text-fill-color: rgba(252, 211, 77, 0.8);
+    animation: starTwinkle 1.5s ease-in-out infinite alternate;
+}
+.handwritten-signature.show::before {
+    left: -1.8rem;
+    animation-delay: 0s;
+}
+.handwritten-signature.show::after {
+    right: -1.8rem;
+    animation-delay: 0.7s;
+}
+@keyframes starTwinkle {
+    from { opacity: 0.2; transform: translateY(-50%) scale(0.8); }
+    to   { opacity: 1;   transform: translateY(-50%) scale(1.3); }
+}
+
+/* Rodapé final */
+.final-footer {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 1.2rem;
+    padding: 2rem 1.5rem;
+    background: linear-gradient(to top, rgba(0, 0, 0, 0.85) 0%, transparent 100%);
+    opacity: 0;
+    transform: translateY(30px);
+    transition: opacity 2s ease, transform 2s ease;
+    z-index: 50;
+}
+.final-footer.show {
+    opacity: 1;
+    transform: translateY(0);
+}
+.final-footer.hidden {
+    display: none;
+}
+.footer-quote {
+    font-family: var(--font-serif);
+    font-style: italic;
+    font-size: 0.95rem;
+    color: rgba(255, 255, 255, 0.55);
+    text-align: center;
+    line-height: 1.7;
+    letter-spacing: 0.02em;
+    max-width: 380px;
+}
+
+/* Botão de reiniciar */
+#btn-restart {
+    border: 1.5px solid rgba(255, 117, 143, 0.5);
+    color: rgba(255, 255, 255, 0.85);
+    background: rgba(255, 117, 143, 0.12);
+    backdrop-filter: blur(8px);
+    transition: all 0.3s ease;
+    padding: 10px 28px;
+    font-size: 0.95rem;
+}
+#btn-restart:hover {
+    background: rgba(255, 117, 143, 0.28);
+    border-color: rgba(255, 117, 143, 0.9);
+    transform: scale(1.05);
+    box-shadow: 0 0 20px rgba(255, 117, 143, 0.35);
+}
+
+/* ==========================================================================
+   RESPONSIVIDADE GERAL
+   ========================================================================== */
+@media (max-width: 480px) {
+    .glass-card {
+        padding: 30px 20px;
+        border-radius: 18px;
+    }
+    .main-title {
+        font-size: 1.8rem;
+        margin-bottom: 25px;
+    }
+    .pre-title {
+        font-size: 2rem;
+    }
+    .section-title {
+        font-size: 1.8rem;
+    }
+    .btn {
+        padding: 12px 24px;
+        font-size: 0.95rem;
+    }
+    .birthday-title {
+        font-size: 2.1rem;
+    }
+    .birthday-text {
+        font-size: 1rem;
+    }
+    .final-text {
+        font-size: 1.25rem;
+    }
+    .final-text-title {
+        font-size: 2.2rem;
+    }
+    .handwritten-signature {
+        font-size: 1.6rem;
+    }
+    .ending-text {
+        font-size: 1rem;
+    }
+    .special-ending {
+        margin-top: 1.5rem;
+        gap: 0.8rem;
+    }
+    .final-container {
+        padding-bottom: 140px;
+    }
+}

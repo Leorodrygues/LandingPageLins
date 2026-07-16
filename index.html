@@ -1,0 +1,468 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Um Presente Especial para Você</title>
+    <meta name="description"
+        content="Uma surpresa de aniversário interativa e cheia de carinho — explore momentos especiais, cartas e muito mais.">
+    <meta property="og:title" content="Um Presente Especial para Você">
+    <meta property="og:description"
+        content="Uma surpresa de aniversário interativa e cheia de carinho — explore momentos especiais, cartas e muito mais.">
+    <meta property="og:type" content="website">
+    <meta property="og:image" content="assets/images/preview.jpg">
+
+    <!-- Google Fonts para tipografia premium -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Alex+Brush&family=Inter:wght@300;400;500;600&family=Playfair+Display:ital,wght@0,400;0,600;0,700;1,400&display=swap"
+        rel="stylesheet">
+
+    <!-- Link para o arquivo CSS -->
+    <link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+    <!-- Loading inicial -->
+    <div id="loading-screen" class="loading-screen">
+        <div class="loading-spinner"></div>
+        <p class="loading-text">Preparando sua surpresa...</p>
+    </div>
+
+    <!-- Canvas global para partículas (estrelas, confetes, corações, fogos) -->
+    <canvas id="bg-canvas"></canvas>
+
+    <!-- Overlay cinematográfico para escurecimento e flash de transição -->
+    <div id="cinema-overlay" class="cinema-overlay"></div>
+    <div id="flash-overlay" class="flash-overlay"></div>
+
+    <!-- Controle de Música Flutuante -->
+    <button id="music-toggle" class="music-toggle-btn hidden" aria-label="Alternar música de fundo">
+        <svg id="music-on-icon" class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M9 18V5l12-2v13"></path>
+            <circle cx="6" cy="18" r="3"></circle>
+            <circle cx="18" cy="16" r="3"></circle>
+        </svg>
+        <svg id="music-off-icon" class="icon hidden" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+            stroke-width="2">
+            <line x1="1" y1="1" x2="23" y2="23"></line>
+            <path d="M9 9v9"></path>
+            <path d="M15 5.5l6-1V12"></path>
+            <circle cx="6" cy="18" r="3"></circle>
+            <circle cx="18" cy="16" r="3"></circle>
+        </svg>
+    </button>
+
+    <!-- CONTAINER PRINCIPAL -->
+    <main id="main-container">
+
+        <!-- ETAPA 1: Tela Inicial -->
+        <section id="stage-1" class="stage active">
+            <div class="glass-card fade-in">
+                <p class="pre-title">Prepare o seu coração...</p>
+                <h1 class="main-title">Tenho uma surpresa para você...</h1>
+                <button id="btn-start" class="btn btn-primary btn-glow" aria-label="Abrir presente especial">
+                    <span>🎁 Abrir Presente</span>
+                </button>
+            </div>
+        </section>
+
+        <!-- ETAPA 2: Presente 3D -->
+        <section id="stage-2" class="stage hidden">
+            <div class="gift-container">
+                <p class="gift-hint animate-pulse">Toque no presente para abrir...</p>
+                <div class="gift-scene">
+                    <div id="gift-box" class="gift-box" role="button" tabindex="0"
+                        aria-label="Clique para abrir o presente">
+                        <div class="gift-face front"></div>
+                        <div class="gift-face back"></div>
+                        <div class="gift-face left"></div>
+                        <div class="gift-face right"></div>
+                        <div class="gift-face top-lid">
+                            <div class="ribbon-bow"></div>
+                        </div>
+                        <div class="gift-face bottom"></div>
+                        <!-- Citações brilhantes internas -->
+                        <div class="gift-light"></div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- ETAPA 3: Contagem Regressiva -->
+        <section id="stage-3" class="stage hidden">
+            <div class="countdown-container">
+                <div id="countdown-number" class="countdown-number">3</div>
+            </div>
+        </section>
+
+        <!-- ETAPA 4: Feliz Aniversário -->
+        <section id="stage-4" class="stage hidden">
+            <div class="glass-card text-center">
+                <h1 class="birthday-title animate-glow">🎉 Feliz Aniversário! 🎉</h1>
+                <p class="birthday-text">
+                    Hoje é um dia incrivelmente especial. Cada detalhe desta surpresa foi planejado com muito amor,
+                    carinho e dedicação para colocar um sorriso no seu rosto.
+                </p>
+                <p class="birthday-subtext">Espero que sinta todo o afeto envolvido neste presente digital...</p>
+                <button id="btn-to-mural" class="btn btn-secondary" aria-label="Ver mural de memórias">
+                    <span>Ver Nossas Memórias 📸</span>
+                </button>
+            </div>
+        </section>
+
+        <!-- ETAPA 5: Mural de Polaroids -->
+        <section id="stage-5" class="stage hidden">
+            <div class="mural-header">
+                <h2 class="section-title">Mural de Memórias</h2>
+                <p class="section-subtitle">Momentos que guardo com muito carinho no meu coração</p>
+            </div>
+
+            <div id="mural-container" class="mural-container">
+                <div class="polaroid" style="--rotation: -5deg; --delay: 0.2s;">
+                    <div class="tape"></div>
+                    <div class="polaroid-img-wrapper">
+                        <!-- Imagem Real -->
+                        <img src="assets/images/1.jpeg" alt="Nosso Início">
+                    </div>
+                    <p class="polaroid-caption">O começo de tudo ✨</p>
+                </div>
+
+                <div class="polaroid" style="--rotation: 4deg; --delay: 0.6s;">
+                    <div class="tape"></div>
+                    <div class="polaroid-img-wrapper">
+                        <!-- Imagem Real -->
+                        <img src="assets/images/2.jpeg" alt="Melhores Risadas">
+                    </div>
+                    <p class="polaroid-caption">Aquelas risadas infinitas 😂</p>
+                </div>
+
+                <div class="polaroid" style="--rotation: -3deg; --delay: 1s;">
+                    <div class="tape"></div>
+                    <div class="polaroid-img-wrapper">
+                        <!-- Imagem Real -->
+                        <img src="assets/images/3.jpeg" alt="Companheirismo">
+                    </div>
+                    <p class="polaroid-caption">Sempre lado a lado 🤍</p>
+                </div>
+
+                <div class="polaroid" style="--rotation: 6deg; --delay: 1.4s;">
+                    <div class="tape"></div>
+                    <div class="polaroid-img-wrapper">
+                        <!-- Imagem Real -->
+                        <img src="assets/images/1.jpeg" alt="Dia Especial">
+                    </div>
+                    <p class="polaroid-caption">Cada instante é único 🌟</p>
+                </div>
+            </div>
+
+            <div class="mural-footer">
+                <button id="btn-to-timeline" class="btn btn-secondary" aria-label="Continuar para linha do tempo">
+                    <span>Continuar nossa jornada... ⏳</span>
+                </button>
+            </div>
+        </section>
+
+        <!-- ETAPA 6: Linha do Tempo -->
+        <section id="stage-6" class="stage hidden">
+            <h2 class="section-title text-center">Nossa História</h2>
+            <p class="section-subtitle text-center">Os pequenos passos que nos trouxeram até este dia</p>
+
+            <div class="timeline-container">
+                <div class="timeline-line"></div>
+
+                <div class="timeline-item" style="--index: 0;">
+                    <div class="timeline-dot"></div>
+                    <div class="timeline-content glass-card">
+                        <h3>✨ O dia em que nos conhecemos</h3>
+                        <div class="timeline-body hidden">
+                            <p>Foi ali que tudo começou. Um momento simples, mas que mudaria o rumo dos meus dias para
+                                sempre. A vida ganhou um brilho totalmente novo a partir daquele instante.</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="timeline-item" style="--index: 1;">
+                    <div class="timeline-dot"></div>
+                    <div class="timeline-content glass-card">
+                        <h3>💬 As conversas que nunca faltavam</h3>
+                        <div class="timeline-body hidden">
+                            <p>Nossas conversas nunca foram apenas mensagens.
+
+                                Elas foram abrigo nos dias difíceis, risadas nos dias leves e companhia quando o
+                                silêncio pesava.
+
+                                Foi nelas que descobri que existem pessoas com quem a gente pode ser exatamente quem é.
+                                E você sempre foi essa pessoa para mim.
+                            </p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="timeline-item" style="--index: 2;">
+                    <div class="timeline-dot"></div>
+                    <div class="timeline-content glass-card">
+                        <h3>😂 As risadas</h3>
+                        <div class="timeline-body hidden">
+                            <p>As piadas internas, os momentos bobos, a leveza de sorrir sem preocupações. Foram tantas
+                                risadas...
+
+                                Algumas por coisas sem sentido, outras por piadas que só nós entendíamos.Mas todas elas
+                                têm uma coisa em comum: sempre deixavam meu dia melhor.
+                                Obrigado por me ensinar que felicidade também mora nas coisas simples.
+                            </p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="timeline-item" style="--index: 3;">
+                    <div class="timeline-dot"></div>
+                    <div class="timeline-content glass-card">
+                        <h3>🤍 Os momentos difíceis</h3>
+                        <div class="timeline-body hidden">
+                            <p>Porque nem todos os dias são fáceis. Mas passar pelas tempestades sabendo que tínhamos um
+                                ao outro tornou tudo mais suportável. O apoio mútuo nos fortaleceu,Mesmo quando a vida
+                                parecia pesada, a gente sempre encontrava um jeito de lembrar um ao outro que ninguém
+                                precisava enfrentar tudo sozinho.</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="timeline-item" style="--index: 4;">
+                    <div class="timeline-dot"></div>
+                    <div class="timeline-content glass-card">
+                        <h3>🎂 Hoje</h3>
+                        <div class="timeline-body hidden">
+                            <p>Hoje celebramos você. Mais do que comemorar um aniversário, hoje eu comemoro a sorte que
+                                tive de cruzar o seu caminho. Celebramos a sua vida, a sua luz e a alegria que você
+                                espalha por
+                                onde passa. Que orgulho e felicidade é poder comemorar esse dia ao seu lado.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="timeline-footer text-center">
+                <button id="btn-to-letter" class="btn btn-secondary" aria-label="Abrir carta especial">
+                    <span>Abrir Carta Especial ✉️</span>
+                </button>
+            </div>
+        </section>
+
+        <!-- ETAPA 7: Carta -->
+        <section id="stage-7" class="stage hidden">
+            <div class="letter-scene">
+                <!-- Envelope -->
+                <div id="envelope" class="envelope" role="button" tabindex="0"
+                    aria-label="Clique para abrir o envelope e ler a carta">
+                    <div class="envelope-flap"></div>
+                    <div class="envelope-pocket"></div>
+                    <div class="envelope-paper">
+                        <div class="paper-content">
+                            <h2 class="handwritten-title">Minha Carta para Você</h2>
+                            <div class="scrollable-letter-text">
+                                <p><strong>Nenê,</strong></p>
+
+                                <p>Escrevo esta carta com o coração transbordando de carinho. No dia de hoje, a única
+                                    coisa que realmente desejo é que você consiga sentir o quanto é especial e
+                                    importante na minha vida.</p>
+
+                                <p>Talvez você nunca tenha percebido o tamanho da diferença que fez nos meus dias. Você
+                                    chegou de um jeito tão natural que, quando percebi, nossas conversas já faziam parte
+                                    da minha rotina, sua companhia já era uma das melhores partes do meu dia e sua
+                                    presença já tinha conquistado um espaço muito bonito no meu coração.</p>
+
+                                <p>Sua presença sempre trouxe leveza, paz e um conforto difícil de explicar. Obrigado
+                                    por cada conversa, por cada risada, pelos conselhos, pelo carinho, pela cumplicidade
+                                    e por todos os momentos que compartilhamos. Sem perceber, fomos criando lembranças
+                                    que vou guardar com muito carinho.</p>
+
+                                <p>Você me ensinou que existem pessoas com quem podemos ser exatamente quem somos. Sem
+                                    máscaras, sem medo de julgamentos, sem precisar esconder o que sentimos. Isso é
+                                    raro... e é justamente isso que faz o nosso vínculo ser tão especial.</p>
+
+                                <p>Você é, sem dúvida, uma das mais belas serendipidades que a vida me proporcionou. Um
+                                    daqueles encontros que acontecem sem planejamento, mas que mudam tudo de uma forma
+                                    bonita e deixam marcas que o tempo não apaga.</p>
+
+                                <p>Se tem um desejo que guardo comigo, é que a vida nunca leve embora aquilo que
+                                    construímos. Que, independentemente da distância, da correria ou dos caminhos que
+                                    seguirmos, a gente continue cultivando essa amizade, esse carinho e essa conexão que
+                                    nasceram de forma tão verdadeira.</p>
+
+                                <p>Neste novo ciclo, desejo que Deus continue guiando cada passo seu. Que Ele acalme os
+                                    seus medos, fortaleça o seu coração, realize os seus sonhos e te lembre todos os
+                                    dias da mulher incrível que você é. Você merece viver uma vida cheia de paz, amor,
+                                    conquistas e felicidade.</p>
+
+                                <p>E nunca se esqueça de uma coisa: você nunca estará sozinha. Sempre que precisar
+                                    conversar, sorrir, desabafar ou simplesmente sentir que existe alguém torcendo por
+                                    você, eu estarei aqui.</p>
+
+                                <p>Obrigado por existir. Obrigado por ser exatamente quem você é. Obrigado por tornar a
+                                    minha vida mais leve, mais bonita e muito mais feliz simplesmente por fazer parte
+                                    dela.</p>
+
+                                <p><strong>Feliz aniversário, nenê.</strong></p>
+
+                                <p>Com todo o meu carinho,<br>
+                                    <strong>Fale baixinho nos seus pensamentos.</strong> ❤️
+                                </p>
+
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="letter-instruction animate-pulse">Toque no envelope para ler a carta...</div>
+
+                <button id="btn-close-letter" class="btn btn-secondary hidden"
+                    aria-label="Fechar carta e ir para o céu estrelado">
+                    <span>Fechar Carta e Olhar o Céu 🌌</span>
+                </button>
+            </div>
+        </section>
+
+        <!-- ETAPA 8: Céu Estrelado Especial (Canvas JS e HTML) -->
+        <section id="stage-8" class="stage hidden">
+            <div class="sky-instruction">
+                <p id="sky-text-overlay" class="sky-text-overlay"></p>
+            </div>
+        </section>
+
+        <!-- ETAPA 9: Frases Surpresa -->
+        <section id="stage-9" class="stage hidden">
+            <h2 class="section-title text-center">Mensagens para Todas as Horas</h2>
+            <p class="section-subtitle text-center">Escolha uma caixinha para abrir quando precisar</p>
+
+            <div class="boxes-container">
+                <button class="box-btn glass-card" data-message="happy">
+                    <span class="box-icon">❤️</span>
+                    <span class="box-text">Abra quando estiver feliz</span>
+                </button>
+                <button class="box-btn glass-card" data-message="miss">
+                    <span class="box-icon">🤍</span>
+                    <span class="box-text">Abra quando sentir saudade</span>
+                </button>
+                <button class="box-btn glass-card" data-message="smile">
+                    <span class="box-icon">✨</span>
+                    <span class="box-text">Abra quando precisar sorrir</span>
+                </button>
+            </div>
+
+            <!-- Modal para exibir as mensagens -->
+            <div id="message-modal" class="modal hidden">
+                <div class="modal-content glass-card">
+                    <span id="close-modal" class="close-modal" aria-label="Fechar janela">&times;</span>
+                    <div id="modal-body-content"></div>
+                </div>
+            </div>
+
+            <div class="boxes-footer text-center">
+                <button id="btn-to-cake" class="btn btn-secondary" aria-label="Ir para o bolo de aniversário">
+                    <span>Preparar o Bolo 🎂</span>
+                </button>
+            </div>
+        </section>
+
+        <!-- ETAPA 10: Bolo de Aniversário -->
+        <section id="stage-10" class="stage hidden">
+            <h2 class="section-title text-center">Faça um Pedido!</h2>
+            <p class="section-subtitle text-center">Toque nas velas para soprá-las</p>
+
+            <div class="cake-container">
+                <div class="cake">
+                    <div class="plate"></div>
+                    <div class="layer layer-bottom"></div>
+                    <div class="layer layer-middle"></div>
+                    <div class="layer layer-top"></div>
+                    <div class="icing"></div>
+                    <div class="drips">
+                        <div class="drip"></div>
+                        <div class="drip"></div>
+                        <div class="drip"></div>
+                        <div class="drip"></div>
+                        <div class="drip"></div>
+                    </div>
+                    <!-- Velas -->
+                    <div class="candles">
+                        <div class="candle" id="candle-1">
+                            <div class="wick"></div>
+                            <div class="flame" role="button" tabindex="0" aria-label="Apagar vela 1"></div>
+                            <div class="smoke"></div>
+                        </div>
+                        <div class="candle" id="candle-2">
+                            <div class="wick"></div>
+                            <div class="flame" role="button" tabindex="0" aria-label="Apagar vela 2"></div>
+                            <div class="smoke"></div>
+                        </div>
+                        <div class="candle" id="candle-3">
+                            <div class="wick"></div>
+                            <div class="flame" role="button" tabindex="0" aria-label="Apagar vela 3"></div>
+                            <div class="smoke"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="cake-footer text-center">
+                <button id="btn-to-final" class="btn btn-secondary hidden" aria-label="Ver mensagem final">
+                    <span>Ver Mensagem Final ❤️</span>
+                </button>
+            </div>
+        </section>
+
+        <!-- ETAPA FINAL -->
+        <section id="stage-final" class="stage hidden">
+            <div class="final-container">
+                <!-- Coração de Neon Pulsante -->
+                <div class="neon-heart-wrapper">
+                    <svg class="neon-heart" viewBox="0 0 32 32">
+                        <path
+                            d="M16,28.2 C16,28.2 3,20.2 3,11.5 C3,6.5 7,3.5 11,3.5 C13.8,3.5 15.1,5 16,6 C16.9,5 18.2,3.5 21,3.5 C25,3.5 29,6.5 29,11.5 C29,20.2 16,28.2 16,28.2 Z" />
+                    </svg>
+                </div>
+
+                <!-- Textos sequenciais -->
+                <div class="final-texts-wrapper">
+                    <!-- Caixa de altura fixa para os textos que aparecem e somem -->
+                    <div class="sequential-texts-box">
+                        <p id="final-text-1" class="final-text">
+                            Existem mais de 8 bilhões de pessoas no mundo.
+                        </p>
+                        <p id="final-text-2" class="final-text">
+                            E, mesmo assim, a vida me deu a sorte de conhecer você.
+                        </p>
+                        <p id="final-text-3" class="final-text">
+                            Obrigado por existir.
+                        </p>
+                        <h1 id="final-text-4" class="final-text-title">
+                            ❤️ Feliz Aniversário ❤️
+                        </h1>
+                    </div>
+
+                    <!-- Encerramento Especial (abaixo, fora da caixa absoluta) -->
+                    <div id="special-ending" class="special-ending hidden">
+                        <p id="ending-text-1" class="ending-text hidden">Feito com muito carinho, exclusivamente para você.</p>
+                        <p id="ending-text-2" class="handwritten-signature hidden">Criado especialmente por Léo ❤️</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Rodapé e Botão -->
+            <div id="final-footer" class="final-footer hidden">
+                <p class="footer-quote">"Alguns presentes podem ser comprados.<br>Outros são construídos com tempo, dedicação e carinho."</p>
+                <button id="btn-restart" class="btn btn-secondary" aria-label="Reviver essa surpresa">
+                    <span>❤️ Reviver essa surpresa</span>
+                </button>
+            </div>
+        </section>
+
+    </main>
+
+    <!-- Link para o arquivo JavaScript -->
+    <script src="script.js"></script>
+</body>
+
+</html>
