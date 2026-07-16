@@ -990,10 +990,19 @@ class StageManager {
             }
         };
 
+        let currentMessage = null;
+
         boxBtns.forEach(btn => {
             btn.addEventListener('click', () => {
                 const msgType = btn.getAttribute('data-message');
                 const msg = messages[msgType];
+
+                if (currentMessage === msgType) {
+                    modal.classList.add('hidden');
+                    currentMessage = null;
+                    this.audio.playSound('tick');
+                    return;
+                }
 
                 modalBody.innerHTML = `
                     <h3 class="modal-message-title">${msg.title}</h3>
@@ -1002,17 +1011,23 @@ class StageManager {
 
                 this.audio.playSound('chime');
                 modal.classList.remove('hidden');
+                currentMessage = msgType;
             });
         });
 
-        closeModal.addEventListener('click', () => {
+        const closeMessageModal = () => {
             modal.classList.add('hidden');
+            currentMessage = null;
             this.audio.playSound('tick');
+        }
+
+        closeModal.addEventListener('click', () => {
+            closeMessageModal();
         });
 
         modal.addEventListener('click', (e) => {
             if (e.target === modal) {
-                modal.classList.add('hidden');
+                closeMessageModal();
             }
         });
 
