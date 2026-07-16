@@ -25,6 +25,21 @@
 </head>
 
 <body>
+    <!-- Tela de Senha -->
+    <div id="password-gate" class="password-gate">
+        <div class="password-card glass-card">
+            <p class="password-pre-title">🔒 Conteúdo Protegido</p>
+            <p class="password-sub">Digite a senha para acessar</p>
+            <div class="password-input-wrapper">
+                <input type="password" id="password-input" class="password-input" placeholder="Senha" maxlength="20" autocomplete="off">
+                <button id="password-submit" class="btn btn-primary btn-glow">
+                    <span>Entrar</span>
+                </button>
+            </div>
+            <p id="password-error" class="password-error hidden">Senha incorreta. Tente novamente.</p>
+        </div>
+    </div>
+
     <!-- Loading inicial -->
     <div id="loading-screen" class="loading-screen">
         <div class="loading-spinner"></div>

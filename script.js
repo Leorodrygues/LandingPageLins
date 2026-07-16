@@ -1320,8 +1320,41 @@ function initBirthdayApp() {
     window.BirthdayApp = { audio, particles, app };
 }
 
+/* ==========================================================================
+   PASSWORD GATE
+   ========================================================================== */
+function initPasswordGate() {
+    const gate = document.getElementById('password-gate');
+    const input = document.getElementById('password-input');
+    const submitBtn = document.getElementById('password-submit');
+    const error = document.getElementById('password-error');
+
+    const correctPassword = 'lins2026';
+
+    function checkPassword() {
+        if (input.value === correctPassword) {
+            gate.classList.add('hidden');
+            setTimeout(() => {
+                gate.style.display = 'none';
+                initBirthdayApp();
+            }, 800);
+        } else {
+            error.classList.remove('hidden');
+            input.value = '';
+            input.focus();
+            setTimeout(() => error.classList.add('hidden'), 3000);
+        }
+    }
+
+    submitBtn.addEventListener('click', checkPassword);
+    input.addEventListener('keydown', (e) => {
+        if (e.key === 'Enter') checkPassword();
+    });
+    input.focus();
+}
+
 if (document.readyState === 'loading') {
-    document.addEventListener('DOMContentLoaded', initBirthdayApp);
+    document.addEventListener('DOMContentLoaded', initPasswordGate);
 } else {
-    initBirthdayApp();
+    initPasswordGate();
 }
