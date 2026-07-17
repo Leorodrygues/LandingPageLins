@@ -6,6 +6,8 @@ class AudioManager {
         this.ctx = null;
         this.isMuted = false;
         this.backgroundMusic = null;
+        this.currentTrackIndex = 0;
+        this.musicTracks = ['music1', 'music2'];
 
         // Elementos de UI de áudio
         this.musicToggle = document.getElementById('music-toggle');
@@ -14,7 +16,8 @@ class AudioManager {
 
         // Mapeamento de sons locais
         this.sounds = {
-            music: 'assets/audio/contramao.mp3',
+            music1: 'assets/audio/contramao.mp3',
+            music2: 'assets/audio/princesa.mp3',
             presentOpen: 'assets/audio/present-open.mp3',
             tick: 'assets/audio/tick.mp3',
             fireworks: 'assets/audio/fireworks.mp3',
@@ -61,14 +64,33 @@ class AudioManager {
         this.initContext();
         if (this.isMuted) return;
 
-        // Reinicia o áudio para garantir que o caminho atualizado seja usado
+        this.currentTrackIndex = 0;
+        this.playTrack(0);
+    }
+
+    playTrack(index) {
+        if (this.isMuted) return;
+        if (index >= this.musicTracks.length) {
+            index = 0;
+        }
+
+        const trackKey = this.musicTracks[index];
+        const src = this.sounds[trackKey];
+        if (!src) return;
+
         if (this.backgroundMusic) {
             this.backgroundMusic.pause();
             this.backgroundMusic = null;
         }
-        this.backgroundMusic = new Audio(this.sounds.music);
-        this.backgroundMusic.loop = true;
+
+        this.backgroundMusic = new Audio(src);
+        this.backgroundMusic.loop = false;
         this.backgroundMusic.volume = 0.4;
+        this.currentTrackIndex = index;
+
+        this.backgroundMusic.addEventListener('ended', () => {
+            this.playTrack(index + 1);
+        });
 
         this.backgroundMusic.play().catch(() => {
             console.log("Arquivo de música ausente. Iniciando sintetizador de música de fundo.");

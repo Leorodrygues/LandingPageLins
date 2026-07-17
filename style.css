@@ -804,10 +804,8 @@ body {
 }
 
 /* Posicionamento Espalhado das Polaroids (Grid Relativo em Telas Grandes) */
-.mural-container .polaroid:nth-child(1) { left: 8%; top: 10%; }
-.mural-container .polaroid:nth-child(2) { left: 52%; top: 5%; }
-.mural-container .polaroid:nth-child(3) { left: 28%; top: 48%; }
-.mural-container .polaroid:nth-child(4) { left: 68%; top: 42%; }
+.mural-container .polaroid:nth-child(1) { left: 15%; top: 20%; }
+.mural-container .polaroid:nth-child(2) { left: 55%; top: 20%; }
 
 .mural-footer {
     margin-top: 40px;
@@ -1209,6 +1207,10 @@ body {
 /* ==========================================================================
    ETAPA 9: FRASES SURPRESA
    ========================================================================== */
+#stage-9 {
+    justify-content: flex-start;
+    padding-top: 60px;
+}
 .boxes-container {
     display: flex;
     gap: 25px;
