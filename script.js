@@ -891,28 +891,23 @@ class StageManager {
         // --- ETAPA 2 (PRESENTE) -> ETAPA 3 (CONTAGEM) ---
         const giftBox = document.getElementById('gift-box');
         const giftScene = giftBox.parentElement;
-        let giftClicked = false;
+        this.giftClicked = false;
 
         giftBox.addEventListener('click', () => {
-            if (giftClicked) return;
-            giftClicked = true;
+            if (this.giftClicked) return;
+            this.giftClicked = true;
 
-            // Animação de tremor rápida
-            giftScene.classList.add('shake');
             this.audio.playSound('presentOpen');
 
-            setTimeout(() => {
-                giftScene.classList.remove('shake');
-                // Tampa voa, câmera dá zoom e luz acende
-                giftScene.classList.add('open');
+            // Tampa voa imediatamente
+            giftScene.classList.add('open');
 
-                // Avança para contagem após animação de abertura
-                setTimeout(() => {
-                    this.transitionTo('stage-3', () => {
-                        this.startCountdown();
-                    });
-                }, 2200);
-            }, 600);
+            // Avança para contagem após animação de voo
+            setTimeout(() => {
+                this.transitionTo('stage-3', () => {
+                    this.startCountdown();
+                });
+            }, 1200);
         });
 
         // --- ETAPA 4 -> ETAPA 5 (MURAL) ---
@@ -965,11 +960,11 @@ class StageManager {
         // Configuração interativa da Carta & Envelope
         const envelope = document.getElementById('envelope');
         const btnCloseLetter = document.getElementById('btn-close-letter');
-        let letterOpened = false;
+        this.letterOpened = false;
 
         envelope.addEventListener('click', () => {
-            if (letterOpened) return;
-            letterOpened = true;
+            if (this.letterOpened) return;
+            this.letterOpened = true;
 
             envelope.classList.add('open');
             this.audio.playSound('letterOpen');
@@ -1009,19 +1004,35 @@ class StageManager {
             smile: {
                 title: "✨ Abra quando precisar sorrir",
                 body: "Respira... Lembra de quantas vezes a gente riu de coisas sem sentido? Você é uma pessoa incrível. A vida pode ser pesada às vezes, mas nunca deixe que ela roube esse sorriso bonito que você tem. E, se ele insistir em não aparecer, me chama. A gente dá um jeito de encontrar um motivo para rir de novo 😊❤️. Deixo aqui um lembrete especial de que você é extremamente especial para mim, Sorria, o dia vai melhorar! 🌟"
+            },
+            fear: {
+                title: "🕊️ Abra quando estiver com medo",
+                body: "Eu sei que o medo existe. Mas eu também sei da força que existe dentro de você. Confie em Deus, confie no caminho que está construindo e, quando esquecer da mulher incrível que é, deixa que eu te lembro. Você nunca esteve sozinha nessa caminhada. ❤️"
+            },
+            cant: {
+                title: "💪 Abra quando achar que não consegue",
+                body: "Você consegue. Talvez hoje não pareça, talvez o coração esteja cansado... mas eu conheço a sua força. Não deixe um momento difícil convencer você de que não é capaz. Você já venceu muita coisa para chegar até aqui. Eu acredito em você. ❤️"
+            },
+            hug: {
+                title: "🤗 Abra quando precisar de um abraço",
+                body: "Fecha os olhos por um instante... Imagina aquele abraço que diz \"vai ficar tudo bem\", sem precisar de muitas palavras. É exatamente esse abraço que eu gostaria de te dar agora. Enquanto ele não acontece, fica com esse carinho em forma de mensagem. Você é muito especial para mim. ❤️"
+            },
+            remember: {
+                title: "💭 Abra quando lembrar de mim",
+                body: "Espero que a lembrança venha acompanhada de um sorriso. Porque, quando eu lembrar de você, vai ser exatamente assim. Algumas pessoas passam pela nossa vida. Você escolheu ficar no meu coração. E isso não muda com a distância. ❤️"
             }
         };
 
-        let currentMessage = null;
+        this.currentMessage = null;
 
         boxBtns.forEach(btn => {
             btn.addEventListener('click', () => {
                 const msgType = btn.getAttribute('data-message');
                 const msg = messages[msgType];
 
-                if (currentMessage === msgType) {
+                if (this.currentMessage === msgType) {
                     modal.classList.add('hidden');
-                    currentMessage = null;
+                    this.currentMessage = null;
                     this.audio.playSound('tick');
                     return;
                 }
@@ -1033,13 +1044,13 @@ class StageManager {
 
                 this.audio.playSound('chime');
                 modal.classList.remove('hidden');
-                currentMessage = msgType;
+                this.currentMessage = msgType;
             });
         });
 
         const closeMessageModal = () => {
             modal.classList.add('hidden');
-            currentMessage = null;
+            this.currentMessage = null;
             this.audio.playSound('tick');
         }
 
@@ -1062,7 +1073,7 @@ class StageManager {
 
         // Configuração interativa do Bolo (Apagar Velas)
         const flames = document.querySelectorAll('.flame');
-        let blownOutCount = 0;
+        this.blownOutCount = 0;
         const btnToFinal = document.getElementById('btn-to-final');
 
         flames.forEach(flame => {
@@ -1071,10 +1082,10 @@ class StageManager {
                 if (!candle.classList.contains('blown-out')) {
                     candle.classList.add('blown-out');
                     this.audio.playSound('blow');
-                    blownOutCount++;
+                    this.blownOutCount++;
 
                     // Se apagou todas as 3 velas
-                    if (blownOutCount === 3) {
+                    if (this.blownOutCount === 3) {
                         setTimeout(() => {
                             this.audio.playSound('confetti');
                             this.particles.spawnConfetti(120);
@@ -1296,6 +1307,60 @@ class StageManager {
                 s.classList.remove('active');
             });
 
+            // Reseta o presente (tampa fechada e clique liberado)
+            const giftScene = document.querySelector('.gift-scene');
+            if (giftScene) {
+                giftScene.classList.remove('open', 'shake');
+            }
+            this.giftClicked = false;
+
+            // Reseta a contagem regressiva
+            const countdownEl = document.getElementById('countdown-number');
+            if (countdownEl) {
+                countdownEl.classList.remove('impact');
+                countdownEl.innerText = '3';
+            }
+
+            // Reseta Polaroids (volta ao estado inicial)
+            document.querySelectorAll('.polaroid').forEach(p => p.classList.remove('throw'));
+
+            // Reseta Timeline (itens recolhidos e corpos fechados)
+            document.querySelectorAll('.timeline-item').forEach(item => item.classList.remove('show'));
+            document.querySelectorAll('.timeline-body').forEach(body => body.classList.remove('active'));
+
+            // Reseta Carta/Envelope (fechado)
+            const envelope = document.getElementById('envelope');
+            if (envelope) envelope.classList.remove('open');
+            const btnCloseLetter = document.getElementById('btn-close-letter');
+            if (btnCloseLetter) {
+                btnCloseLetter.classList.add('hidden');
+                btnCloseLetter.classList.remove('fade-in');
+            }
+            this.letterOpened = false;
+
+            // Reseta janela de mensagens (modal fechado)
+            const modal = document.getElementById('message-modal');
+            if (modal) modal.classList.add('hidden');
+            const modalBody = document.getElementById('modal-body-content');
+            if (modalBody) modalBody.innerHTML = '';
+            this.currentMessage = null;
+
+            // Reseta Céu Estrelado (texto e overlay)
+            const skyOverlay = document.getElementById('sky-text-overlay');
+            if (skyOverlay) {
+                skyOverlay.classList.remove('show');
+                skyOverlay.innerText = '';
+            }
+
+            // Reseta Velas (todas acesas, botão escondido)
+            document.querySelectorAll('.candle').forEach(c => c.classList.remove('blown-out'));
+            const btnToFinal = document.getElementById('btn-to-final');
+            if (btnToFinal) {
+                btnToFinal.classList.add('hidden');
+                btnToFinal.classList.remove('fade-in');
+            }
+            this.blownOutCount = 0;
+
             // Reseta textos sequenciais (só usam opacity via .show)
             ['final-text-1', 'final-text-2', 'final-text-3', 'final-text-4'].forEach(id => {
                 const el = document.getElementById(id);
@@ -1317,7 +1382,10 @@ class StageManager {
             this.particles.particles = [];
             this.particles.fireworks = [];
 
-            // Reseta e reinicia música
+            // Reseta áudio (garante som ligado)
+            this.audio.isMuted = false;
+            document.getElementById('music-on-icon')?.classList.remove('hidden');
+            document.getElementById('music-off-icon')?.classList.add('hidden');
             this.audio.playMusic();
 
             // Volta ao stage-1
