@@ -1207,25 +1207,19 @@ class StageManager {
             }, 5000);
         };
 
-        // 1. Estrelas formam "E, sem perceber..."
+        // Coração de estrelas fixo o tempo todo
+        const pointsHeart = this.particles.generateHeartCoordinates();
+        if (pointsHeart.length > 0) {
+            this.particles.setConstellation(pointsHeart);
+        }
+
+        // 1. "E, sem perceber..."
         setTimeout(() => {
-            const points1 = this.particles.generateCoordinatesFromText("E, sem perceber...", 1.2);
-            if (points1.length > 0) {
-                this.particles.setConstellation(points1);
-            }
             showSkyPhrase("E, sem perceber...", () => {
-                // 2. Estrelas formam "Você também me cativou."
-                const points2 = this.particles.generateCoordinatesFromText("Você também me cativou.", 1.0);
-                if (points2.length > 0) {
-                    this.particles.setConstellation(points2);
-                }
+                // 2. "Você também me cativou."
                 showSkyPhrase("Você também me cativou.", () => {
-                    // 3. Estrelas formam um coração
-                    const pointsHeart = this.particles.generateHeartCoordinates();
-                    if (pointsHeart.length > 0) {
-                        this.particles.setConstellation(pointsHeart);
-                    }
-                    showSkyPhrase("Elas brilham por você 🤍", () => {
+                    // 3. "Olhe para as estrelas... Elas brilham por você"
+                    showSkyPhrase("Olhe para as estrelas... Elas brilham por você 🤍", () => {
                         // 4. Transita para as caixinhas de mensagens
                         this.particles.resetConstellation();
                         this.transitionTo('stage-9');
