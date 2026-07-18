@@ -978,10 +978,11 @@ class StageManager {
             this.transitionTo('stage-7');
         });
 
-        // Configuração interativa da Carta & Envelope
+        // Configuração interativa da Carta & Envelope com Typewriter
         const envelope = document.getElementById('envelope');
-        const btnCloseLetter = document.getElementById('btn-close-letter');
+        const btnContinuar = document.getElementById('btn-continuar');
         this.letterOpened = false;
+        this.letterTypewriterDone = false;
 
         envelope.addEventListener('click', () => {
             if (this.letterOpened) return;
@@ -990,21 +991,26 @@ class StageManager {
             envelope.classList.add('open');
             this.audio.playSound('letterOpen');
 
-            // Revela botão de fechar após a carta abrir por completo
+            // Inicia a revelação da continuação da carta com typewriter
             setTimeout(() => {
-                btnCloseLetter.classList.remove('hidden');
-                btnCloseLetter.classList.add('fade-in');
-            }, 1200);
+                this.startLetterTypewriter();
+            }, 1500);
         });
 
-        // --- ETAPA 7 -> ETAPA 8 (CÉU ESTRELADO) ---
-        btnCloseLetter.addEventListener('click', (e) => {
-            e.stopPropagation(); // Impede o clique de redisparar no envelope
+        // --- ETAPA 7 -> ETAPA 8 (CÉU ESTRELADO) via botão Continuar ---
+        btnContinuar.addEventListener('click', (e) => {
+            e.stopPropagation();
             this.audio.playSound('chime');
 
-            this.transitionTo('stage-8', () => {
-                this.startSkyConstellation();
-            });
+            // Fecha o envelope com animação
+            envelope.classList.remove('open');
+            envelope.classList.add('closing');
+
+            setTimeout(() => {
+                this.transitionTo('stage-8', () => {
+                    this.startSkyConstellation();
+                });
+            }, 1500);
         });
 
         // --- ETAPA 9 (FRASES SURPRESA) ---
@@ -1185,250 +1191,375 @@ class StageManager {
         }, 1200);
     }
 
-    // Efeito do Céu Estrelado Especial (Constelações)
+    // Efeito do Céu Estrelado Especial — "E, sem perceber... Você também me cativou."
     startSkyConstellation() {
         const overlayText = document.getElementById('sky-text-overlay');
         overlayText.innerText = "";
         overlayText.classList.remove('show');
 
-        // 1. Gera e aplica constelação de "Feliz Aniversário"
-        setTimeout(() => {
-            const pointsText = this.particles.generateCoordinatesFromText("Feliz\nAniversário", 1.1);
-            if (pointsText.length > 0) {
-                this.particles.setConstellation(pointsText);
-            }
-            overlayText.innerText = "Olhe para as estrelas...";
+        const showSkyPhrase = (text, callback) => {
+            overlayText.innerText = text;
             overlayText.classList.add('show');
             this.audio.playSound('chime');
-        }, 1000);
-
-        // 2. Muda a constelação para formato de Coração
-        setTimeout(() => {
-            overlayText.classList.remove('show');
-
             setTimeout(() => {
-                const pointsHeart = this.particles.generateHeartCoordinates();
-                if (pointsHeart.length > 0) {
-                    this.particles.setConstellation(pointsHeart);
+                overlayText.classList.remove('show');
+                setTimeout(callback, 1200);
+            }, 5000);
+        };
+
+        // 1. Estrelas formam "E, sem perceber..."
+        setTimeout(() => {
+            const points1 = this.particles.generateCoordinatesFromText("E, sem perceber...", 1.2);
+            if (points1.length > 0) {
+                this.particles.setConstellation(points1);
+            }
+            showSkyPhrase("E, sem perceber...", () => {
+                // 2. Estrelas formam "Você também me cativou."
+                const points2 = this.particles.generateCoordinatesFromText("Você também me cativou.", 1.0);
+                if (points2.length > 0) {
+                    this.particles.setConstellation(points2);
                 }
-                overlayText.innerText = "Elas brilham por você 🤍";
-                overlayText.classList.add('show');
-                this.audio.playSound('chime');
-            }, 1000);
-
-        }, 6000);
-
-        // 3. Reseta constelação e transita para frases surpresas
-        setTimeout(() => {
-            overlayText.classList.remove('show');
-            this.particles.resetConstellation();
-
-            setTimeout(() => {
-                this.transitionTo('stage-9');
-            }, 1500);
-
-        }, 11500);
+                showSkyPhrase("Você também me cativou.", () => {
+                    // 3. Estrelas formam um coração
+                    const pointsHeart = this.particles.generateHeartCoordinates();
+                    if (pointsHeart.length > 0) {
+                        this.particles.setConstellation(pointsHeart);
+                    }
+                    showSkyPhrase("Elas brilham por você 🤍", () => {
+                        // 4. Transita para as caixinhas de mensagens
+                        this.particles.resetConstellation();
+                        this.transitionTo('stage-9');
+                    });
+                });
+            });
+        }, 1500);
     }
 
     // Sequenciador de legendas da Etapa Final
     startFinalCinema() {
-        const text1 = document.getElementById('final-text-1');
-        const text2 = document.getElementById('final-text-2');
         const text3 = document.getElementById('final-text-3');
         const textTitle = document.getElementById('final-text-4');
-        const specialEnding = document.getElementById('special-ending');
-        const endingText1 = document.getElementById('ending-text-1');
-        const endingText2 = document.getElementById('ending-text-2');
         const finalFooter = document.getElementById('final-footer');
+        const sigWrapper = document.getElementById('final-signature-wrapper');
+        const sigText = document.getElementById('final-signature-text');
+        const sigStars = document.getElementById('final-signature-stars');
 
-        // Sequência temporal de fades cinematográficos
+        // 1. Coração neon já aparece (está no HTML)
+        // 2. "Obrigado por existir."
         setTimeout(() => {
-            text1.classList.add('show');
+            text3.classList.add('show');
         }, 1500);
 
-        setTimeout(() => {
-            text1.classList.remove('show');
-            setTimeout(() => {
-                text2.classList.add('show');
-            }, 1000);
-        }, 5500);
-
-        setTimeout(() => {
-            text2.classList.remove('show');
-            setTimeout(() => {
-                text3.classList.add('show');
-            }, 1000);
-        }, 9500);
-
+        // 3. Some e mostra "❤️ Feliz Aniversário ❤️"
         setTimeout(() => {
             text3.classList.remove('show');
-
             setTimeout(() => {
                 textTitle.classList.add('show');
                 this.audio.playSound('chime');
-                // Lança partículas festivas finais suaves no fundo
-                this.particles.spawnConfetti(80);
+                this.particles.spawnConfetti(60);
 
+                // Fogos de artifício periódicos
                 const fireworkInterval = setInterval(() => {
                     if (this.currentStageId === 'stage-final' && Math.random() > 0.6) {
                         this.particles.spawnFirework();
                     }
                 }, 3000);
-                // Guarda referência para poder parar depois
                 this._fireworkInterval = fireworkInterval;
-            }, 1500);
-        }, 13000);
+            }, 1000);
+        }, 5500);
 
-        // --- ENCERRAMENTO ESPECIAL (começa após 18s) ---
-        // Silêncio: o título fica pulsando por alguns segundos
+        // 4. Título some, aparece assinatura com estrelas
         setTimeout(() => {
-            // O título some suavemente
             textTitle.classList.remove('show');
-
-            // Para fogos e abaixa a música
             if (this._fireworkInterval) clearInterval(this._fireworkInterval);
             this.audio.fadeMusic(0.08, 5000);
-
-        }, 18000);
+        }, 12000);
 
         setTimeout(() => {
-            // Mostra o container do encerramento
-            specialEnding.classList.remove('hidden');
-            requestAnimationFrame(() => specialEnding.classList.add('show'));
-
-            // Primeiro texto aparece
+            // Mostra assinatura
+            sigWrapper.classList.add('show');
             setTimeout(() => {
-                endingText1.classList.remove('hidden');
-                requestAnimationFrame(() => endingText1.classList.add('show'));
-            }, 800);
+                sigText.classList.add('show');
+                this.audio.playSound('chime');
+                this.particles.spawnHeartRain();
+            }, 1000);
+            setTimeout(() => {
+                sigStars.classList.add('show');
+            }, 2500);
+        }, 15000);
 
-        }, 20000);
-
-        setTimeout(() => {
-            // Assinatura com efeito de escrita
-            endingText2.classList.remove('hidden');
-            requestAnimationFrame(() => endingText2.classList.add('show'));
-            this.audio.playSound('chime');
-
-            // Dispara chuva de corações
-            this.particles.spawnHeartRain();
-
-        }, 23500);
-
-        // Rodapé aparece por último
+        // 5. Rodapé aparece por último
         setTimeout(() => {
             finalFooter.classList.remove('hidden');
             requestAnimationFrame(() => finalFooter.classList.add('show'));
-        }, 27000);
+        }, 22000);
     }
 
-    // Reinicia toda a experiência do zero
-    resetApp() {
-        // Escurece a tela antes de reiniciar
-        this.cinemaOverlay.classList.add('active');
+    // Animação typewriter para a carta inteira
+    startLetterTypewriter() {
+        const typewriterArea = document.getElementById('typewriter-area');
+        const climaxArea = document.getElementById('climax-area');
+        const btnContinuar = document.getElementById('btn-continuar');
+        const scrollableText = document.getElementById('scrollable-letter');
 
-        setTimeout(() => {
-            // Oculta todos os stages
-            document.querySelectorAll('.stage').forEach(s => {
-                s.classList.add('hidden');
-                s.classList.remove('active');
-            });
+        if (!typewriterArea) return;
 
-            // Reseta o presente (tampa fechada e clique liberado)
-            const giftScene = document.querySelector('.gift-scene');
-            if (giftScene) {
-                giftScene.classList.remove('open', 'shake');
-            }
-            this.giftClicked = false;
+        const paragraphs = [
+            "Nenê,",
+            "Escrevo essa carta com o coração transbordando de carinho. No dia de hoje, a única coisa que realmente desejo é que você consiga sentir o quanto é especial e importante na minha vida.",
+            "Talvez você nunca tenha percebido o tamanho da diferença que faz nos meus dias. Você chegou de um jeito tão natural que, quando percebi, nossas conversas já faziam parte da minha rotina, sua companhia já era uma das melhores partes do meu dia e sua presença já tinha conquistado um espaço muito especial no meu coração.",
+            "Sua presença sempre trouxe leveza, paz e um conforto difícil de explicar. Obrigado por cada conversa, por cada risada, pelos conselhos, pelo carinho, pela cumplicidade e por todos os momentos que compartilhamos. Sem perceber, fomos criando lembranças que vou guardar com muito carinho.",
+            "Você me ensinou que existem pessoas com quem podemos ser exatamente quem somos. Sem máscaras, sem medo de julgamentos, sem precisar esconder o que sentimos. Isso é raro... e é justamente isso que faz o nosso vínculo ser tão especial.",
+            "Você é, sem dúvida, uma das mais belas serendipidades que a vida me proporcionou. Um daqueles encontros que acontecem sem planejamento, na CONTRAMÃO rsrs, mas que mudam tudo de uma forma linda e deixam marcas que o tempo não apaga.",
+            "Se tem um desejo que guardo comigo, é que a vida nunca leve embora aquilo que construímos. Que, independentemente da distância, da correria ou dos caminhos que seguirmos, a gente continue cultivando essa amizade, esse carinho e essa conexão que nasceram de forma tão verdadeira. Quero pra sempre.",
+            "Neste novo ciclo, desejo que Deus continue guiando cada passo seu. Que Ele acalme os seus medos, fortaleça o seu coração, realize os seus sonhos e te lembre todos os dias da mulher incrível que você é. Você merece viver uma vida cheia de paz, amor, conquistas e felicidade.",
+            "E nunca se esqueça de uma coisa: você nunca estará sozinha. Sempre que precisar conversar, sorrir, desabafar ou simplesmente sentir que existe alguém torcendo por você, eu estarei aqui.",
+            "Obrigado por existir. Obrigado por ser exatamente quem você é. Obrigado por tornar a minha vida mais leve, e muito mais feliz, simplesmente por fazer parte dela.",
+            "Feliz aniversário, nenê.",
+            "",
+            "Mas... antes de terminar essa carta, existe uma coisa que eu gostaria que você soubesse.",
+            "Obrigado por tudo o que construímos até aqui.",
+            "Talvez o tempo passe.\nTalvez a vida nos leve por caminhos diferentes.\nTalvez a rotina mude muitas coisas.",
+            "Mas existe uma escolha que eu continuarei fazendo todos os dias.",
+            "Escolher cuidar do vínculo que criamos.",
+            "Porque existem pessoas que passam pela nossa vida.\nOutras deixam lembranças.\nMas existem aquelas que deixam marcas na gente.",
+            "E você fez isso comigo.",
+            "Sem perceber...\nVocê se tornou parte das minhas melhores lembranças.\nParte dos meus dias.\nParte da minha história.",
+            "E, sinceramente...\nEspero continuar construindo muitos outros momentos ao seu lado.",
+            "Se um dia você esquecer qualquer palavra desta carta...\nEspero que se lembre apenas de uma."
+        ];
 
-            // Reseta a contagem regressiva
-            const countdownEl = document.getElementById('countdown-number');
-            if (countdownEl) {
-                countdownEl.classList.remove('impact');
-                countdownEl.innerText = '3';
-            }
+        const speeds = [
+            85,   // Nenê,
+            85,   // Escrevo essa carta...
+            80,   // Talvez você nunca...
+            80,   // Sua presença sempre...
+            80,   // Você me ensinou...
+            85,   // Você é, sem dúvida...
+            85,   // Se tem um desejo...
+            85,   // Neste novo ciclo...
+            85,   // E nunca se esqueça...
+            80,   // Obrigado por existir...
+            100,  // Feliz aniversário, nenê.
+            400,  // (pausa - linha vazia)
+            80,   // Mas... antes de terminar...
+            85,   // Obrigado por tudo...
+            85,   // Talvez o tempo passe...
+            90,   // Mas existe uma escolha...
+            85,   // Escolher cuidar...
+            80,   // Porque existem pessoas...
+            100,  // E você fez isso comigo.
+            120,  // Sem perceber...
+            130,  // E, sinceramente...
+            150   // Se um dia você esquecer...
+        ];
 
-            // Reseta Polaroids (volta ao estado inicial)
-            document.querySelectorAll('.polaroid').forEach(p => p.classList.remove('throw'));
-
-            // Reseta Timeline (itens recolhidos e corpos fechados)
-            document.querySelectorAll('.timeline-item').forEach(item => item.classList.remove('show'));
-            document.querySelectorAll('.timeline-body').forEach(body => body.classList.remove('active'));
-
-            // Reseta Carta/Envelope (fechado)
-            const envelope = document.getElementById('envelope');
-            if (envelope) envelope.classList.remove('open');
-            const btnCloseLetter = document.getElementById('btn-close-letter');
-            if (btnCloseLetter) {
-                btnCloseLetter.classList.add('hidden');
-                btnCloseLetter.classList.remove('fade-in');
-            }
-            this.letterOpened = false;
-
-            // Reseta janela de mensagens (modal fechado)
-            const modal = document.getElementById('message-modal');
-            if (modal) modal.classList.add('hidden');
-            const modalBody = document.getElementById('modal-body-content');
-            if (modalBody) modalBody.innerHTML = '';
-            this.currentMessage = null;
-
-            // Reseta Céu Estrelado (texto e overlay)
-            const skyOverlay = document.getElementById('sky-text-overlay');
-            if (skyOverlay) {
-                skyOverlay.classList.remove('show');
-                skyOverlay.innerText = '';
-            }
-
-            // Reseta Velas (todas acesas, botão escondido)
-            document.querySelectorAll('.candle').forEach(c => c.classList.remove('blown-out'));
-            const btnToFinal = document.getElementById('btn-to-final');
-            if (btnToFinal) {
-                btnToFinal.classList.add('hidden');
-                btnToFinal.classList.remove('fade-in');
-            }
-            this.blownOutCount = 0;
-
-            // Reseta textos sequenciais (só usam opacity via .show)
-            ['final-text-1', 'final-text-2', 'final-text-3', 'final-text-4'].forEach(id => {
-                const el = document.getElementById(id);
-                if (el) el.classList.remove('show');
-            });
-
-            // Reseta textos do encerramento (voltam ao hidden)
-            ['ending-text-1', 'ending-text-2'].forEach(id => {
-                const el = document.getElementById(id);
-                if (el) { el.classList.remove('show'); el.classList.add('hidden'); }
-            });
-            const specialEnding = document.getElementById('special-ending');
-            if (specialEnding) { specialEnding.classList.remove('show'); specialEnding.classList.add('hidden'); }
-
-            const finalFooter = document.getElementById('final-footer');
-            if (finalFooter) { finalFooter.classList.remove('show'); finalFooter.classList.add('hidden'); }
-
-            // Limpa partículas (mantém estrelas)
-            this.particles.particles = [];
-            this.particles.fireworks = [];
-
-            // Reseta áudio (garante som ligado)
-            this.audio.isMuted = false;
-            document.getElementById('music-on-icon')?.classList.remove('hidden');
-            document.getElementById('music-off-icon')?.classList.add('hidden');
-            this.audio.playMusic();
-
-            // Volta ao stage-1
-            this.currentStageId = 'stage-1';
-            const stage1 = document.getElementById('stage-1');
-            if (stage1) {
-                stage1.classList.remove('hidden');
-                stage1.classList.add('active');
-            }
-
-            // Clareia a tela
+        this.typewriteParagraphs(typewriterArea, paragraphs, speeds, () => {
+            // Pausa dramática de 3 segundos
             setTimeout(() => {
-                this.cinemaOverlay.classList.remove('active');
-            }, 300);
+                // Esconde cursor
+                const cursor = typewriterArea.querySelector('.typewriter-cursor');
+                if (cursor) cursor.classList.add('hidden');
 
-        }, 1200);
+                // Revela a frase clímax
+                climaxArea.classList.remove('hidden');
+                requestAnimationFrame(() => climaxArea.classList.add('show'));
+                this.audio.playSound('chime');
+
+                // Mostra botão Continuar após 2 segundos
+                setTimeout(() => {
+                    btnContinuar.classList.remove('hidden');
+                    btnContinuar.classList.add('fade-in');
+                }, 2000);
+            }, 3200);
+        });
+    }
+
+    typewriteParagraphs(container, paragraphs, speeds, onComplete) {
+        let paraIndex = 0;
+        let charIndex = 0;
+        let currentP = null;
+        let cursor = null;
+
+        // Cria o cursor
+        cursor = document.createElement('span');
+        cursor.className = 'typewriter-cursor';
+        container.appendChild(cursor);
+
+        const typeNextChar = () => {
+            if (paraIndex >= paragraphs.length) {
+                if (onComplete) onComplete();
+                return;
+            }
+
+            if (!currentP) {
+                currentP = document.createElement('p');
+                container.insertBefore(currentP, cursor);
+            }
+
+            const text = paragraphs[paraIndex];
+            if (charIndex < text.length) {
+                if (text[charIndex] === '\n') {
+                    currentP.appendChild(document.createElement('br'));
+                } else {
+                    currentP.appendChild(document.createTextNode(text[charIndex]));
+                }
+                charIndex++;
+                const speed = typeof speeds === 'number' ? speeds : (speeds[paraIndex] || 35);
+                // Auto-scroll enquanto digita
+                const scrollableText = document.getElementById('scrollable-letter');
+                if (scrollableText) {
+                    scrollableText.scrollTop = scrollableText.scrollHeight;
+                }
+                setTimeout(typeNextChar, speed);
+            } else {
+                // Próximo parágrafo
+                paraIndex++;
+                charIndex = 0;
+                currentP = null;
+                // Pausa entre parágrafos (mais longa nos trechos emocionais)
+                const interParagraphDelay = paraIndex >= 8 ? 800 : (paraIndex >= 5 ? 500 : 350);
+                setTimeout(typeNextChar, interParagraphDelay);
+            }
+        };
+
+        typeNextChar();
+    }
+
+    // Reinicia toda a experiência do zero (com tela preta + frase)
+    resetApp() {
+        const restartOverlay = document.getElementById('restart-overlay');
+        const restartPhrase = document.getElementById('restart-phrase');
+
+        // Remove hidden para poder animar o opacity
+        restartOverlay.classList.remove('hidden');
+        restartPhrase.classList.remove('hidden');
+
+        // Força reflow para garantir que a transição funcione
+        void restartOverlay.offsetWidth;
+
+        // Mostra a tela preta
+        restartOverlay.classList.add('show');
+
+        // Após 1.5s, mostra a frase com fade
+        setTimeout(() => {
+            restartPhrase.classList.add('show');
+        }, 1500);
+
+        // Após 5s, frase some e começa o reset de verdade
+        setTimeout(() => {
+            restartPhrase.classList.remove('show');
+
+            setTimeout(() => {
+                restartOverlay.classList.remove('show');
+
+                setTimeout(() => {
+                    restartOverlay.classList.add('hidden');
+                    restartPhrase.classList.add('hidden');
+
+                    // --- Reset completo do estado ---
+                    document.querySelectorAll('.stage').forEach(s => {
+                        s.classList.add('hidden');
+                        s.classList.remove('active');
+                    });
+
+                    const giftScene = document.querySelector('.gift-scene');
+                    if (giftScene) {
+                        giftScene.classList.remove('open', 'shake');
+                    }
+                    this.giftClicked = false;
+
+                    const countdownEl = document.getElementById('countdown-number');
+                    if (countdownEl) {
+                        countdownEl.classList.remove('impact');
+                        countdownEl.innerText = '3';
+                    }
+
+                    document.querySelectorAll('.polaroid').forEach(p => p.classList.remove('throw'));
+
+                    document.querySelectorAll('.timeline-item').forEach(item => item.classList.remove('show'));
+                    document.querySelectorAll('.timeline-body').forEach(body => body.classList.remove('active'));
+
+                    const envelope = document.getElementById('envelope');
+                    if (envelope) {
+                        envelope.classList.remove('open');
+                        envelope.classList.remove('closing');
+                    }
+                    const btnContinuar = document.getElementById('btn-continuar');
+                    if (btnContinuar) {
+                        btnContinuar.classList.add('hidden');
+                        btnContinuar.classList.remove('fade-in');
+                    }
+                    const typewriterArea = document.getElementById('typewriter-area');
+                    if (typewriterArea) typewriterArea.innerHTML = '';
+                    const climaxArea = document.getElementById('climax-area');
+                    if (climaxArea) {
+                        climaxArea.classList.add('hidden');
+                        climaxArea.classList.remove('show');
+                    }
+                    this.letterOpened = false;
+                    this.letterTypewriterDone = false;
+
+                    const modal = document.getElementById('message-modal');
+                    if (modal) modal.classList.add('hidden');
+                    const modalBody = document.getElementById('modal-body-content');
+                    if (modalBody) modalBody.innerHTML = '';
+                    this.currentMessage = null;
+
+                    const skyOverlay = document.getElementById('sky-text-overlay');
+                    if (skyOverlay) {
+                        skyOverlay.classList.remove('show');
+                        skyOverlay.innerText = '';
+                    }
+
+                    document.querySelectorAll('.candle').forEach(c => c.classList.remove('blown-out'));
+                    const btnToFinal = document.getElementById('btn-to-final');
+                    if (btnToFinal) {
+                        btnToFinal.classList.add('hidden');
+                        btnToFinal.classList.remove('fade-in');
+                    }
+                    this.blownOutCount = 0;
+
+                    ['final-text-1', 'final-text-2', 'final-text-3', 'final-text-4'].forEach(id => {
+                        const el = document.getElementById(id);
+                        if (el) el.classList.remove('show');
+                    });
+
+                    ['ending-text-1', 'ending-text-2'].forEach(id => {
+                        const el = document.getElementById(id);
+                        if (el) { el.classList.remove('show'); el.classList.add('hidden'); }
+                    });
+                    const specialEnding = document.getElementById('special-ending');
+                    if (specialEnding) { specialEnding.classList.remove('show'); specialEnding.classList.add('hidden'); }
+
+                    const sigWrapper = document.getElementById('final-signature-wrapper');
+                    if (sigWrapper) sigWrapper.classList.remove('show');
+                    const sigText = document.getElementById('final-signature-text');
+                    if (sigText) sigText.classList.remove('show');
+                    const sigStars = document.getElementById('final-signature-stars');
+                    if (sigStars) sigStars.classList.remove('show');
+
+                    const finalFooter = document.getElementById('final-footer');
+                    if (finalFooter) { finalFooter.classList.remove('show'); finalFooter.classList.add('hidden'); }
+
+                    this.particles.particles = [];
+                    this.particles.fireworks = [];
+
+                    this.audio.isMuted = false;
+                    document.getElementById('music-on-icon')?.classList.remove('hidden');
+                    document.getElementById('music-off-icon')?.classList.add('hidden');
+                    this.audio.playMusic();
+
+                    this.currentStageId = 'stage-1';
+                    const stage1 = document.getElementById('stage-1');
+                    if (stage1) {
+                        stage1.classList.remove('hidden');
+                        stage1.classList.add('active');
+                    }
+
+                }, 1200);
+            }, 1500);
+        }, 5000);
     }
 }
 

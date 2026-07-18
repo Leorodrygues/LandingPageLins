@@ -260,66 +260,21 @@
                     <div class="envelope-paper">
                         <div class="paper-content">
                             <h2 class="handwritten-title">Minha Carta para Você</h2>
-                            <div class="scrollable-letter-text">
-                                <p><strong>Nenê,</strong></p>
-
-                                <p>Escrevo esse pensamento com o coração transbordando de carinho. No dia de hoje, a
-                                    única
-                                    coisa que realmente desejo é que você consiga sentir o quanto é especial e
-                                    importante na minha vida.</p>
-
-                                <p>Talvez você nunca tenha percebido o tamanho da diferença que faz nos meus dias. Você
-                                    chegou de um jeito tão natural que, quando percebi, nossas conversas já faziam parte
-                                    da minha rotina, sua companhia já era uma das melhores partes do meu dia e sua
-                                    presença já tinha conquistado um espaço muito especial no meu coração.</p>
-
-                                <p>Sua presença sempre trouxe leveza, paz e um conforto difícil de explicar. Obrigado
-                                    por cada conversa, por cada risada, pelos conselhos, pelo carinho, pela cumplicidade
-                                    e por todos os momentos que compartilhamos. Sem perceber, fomos criando lembranças
-                                    que vou guardar com muito carinho.</p>
-
-                                <p>Você me ensinou que existem pessoas com quem podemos ser exatamente quem somos. Sem
-                                    máscaras, sem medo de julgamentos, sem precisar esconder o que sentimos. Isso é
-                                    raro... e é justamente isso que faz o nosso vínculo ser tão especial.</p>
-
-                                <p>Você é, sem dúvida, uma das mais belas serendipidades que a vida me proporcionou. Um
-                                    daqueles encontros que acontecem sem planejamento, na CONTRAMÂO rsrs, mas que mudam
-                                    tudo de uma forma
-                                    linda e deixam marcas que o tempo não apaga.</p>
-
-                                <p>Se tem um desejo que guardo comigo, é que a vida nunca leve embora aquilo que
-                                    construímos. Que, independentemente da distância, da correria ou dos caminhos que
-                                    seguirmos, a gente continue cultivando essa amizade, esse carinho e essa conexão que
-                                    nasceram de forma tão verdadeira, quero pra Sempre</p>
-
-                                <p>Neste novo ciclo, desejo que Deus continue guiando cada passo seu. Que Ele acalme os
-                                    seus medos, fortaleça o seu coração, realize os seus sonhos e te lembre todos os
-                                    dias da mulher incrível que você é. Você merece viver uma vida cheia de paz, amor,
-                                    conquistas e felicidade.</p>
-
-                                <p>E nunca se esqueça de uma coisa: você nunca estará sozinha. Sempre que precisar
-                                    conversar, sorrir, desabafar ou simplesmente sentir que existe alguém torcendo por
-                                    você, eu estarei aqui 📞.</p>
-
-                                <p>Obrigado por existir. Obrigado por ser exatamente quem você é. Obrigado por tornar a
-                                    minha vida mais leve, e muito mais feliz simplesmente por fazer parte
-                                    dela.</p>
-
-                                <p><strong>Feliz aniversário, nenê.</strong></p>
-
-                                <p>Com todo o meu carinho,<br>
-                                    <strong>Você sabe quem!</strong> ❤️
-                                </p>
-
+                            <div id="scrollable-letter" class="scrollable-letter-text">
+                                <div id="typewriter-area" class="typewriter-area"></div>
+                                <div id="climax-area" class="climax-area hidden">
+                                    <p class="climax-phrase">"Eu escolhi te cativar."</p>
+                                    <p class="climax-sub">...e essa sempre será uma das escolhas mais bonitas que fiz.</p>
+                                </div>
                             </div>
                         </div>
                     </div>
                 </div>
                 <div class="letter-instruction animate-pulse">Toque no envelope para ler a carta...</div>
 
-                <button id="btn-close-letter" class="btn btn-secondary hidden"
-                    aria-label="Fechar carta e ir para o céu estrelado">
-                    <span>Fechar Carta e Olhar o Céu 🌌</span>
+                <button id="btn-continuar" class="btn btn-secondary hidden"
+                    aria-label="Continuar para o céu estrelado">
+                    <span>❤️ Continuar</span>
                 </button>
             </div>
         </section>
@@ -460,6 +415,18 @@
                 </div>
             </div>
 
+            <!-- Assinatura Final -->
+            <div id="final-signature-wrapper" class="final-signature-wrapper">
+                <div id="final-signature-text" class="final-signature-text">Criado especialmente por "Você sabe quem!" ❤️</div>
+                <div id="final-signature-stars" class="final-signature-stars">
+                    <span class="final-signature-star">✦</span>
+                    <span class="final-signature-star">✦</span>
+                    <span class="final-signature-star">✦</span>
+                    <span class="final-signature-star">✦</span>
+                    <span class="final-signature-star">✦</span>
+                </div>
+            </div>
+
             <!-- Rodapé e Botão -->
             <div id="final-footer" class="final-footer hidden">
                 <p class="footer-quote">"Alguns presentes podem ser comprados.<br>Outros são construídos com tempo,
@@ -469,6 +436,11 @@
                 </button>
             </div>
         </section>
+
+        <!-- Tela de Reinício (tela preta + frase) -->
+        <div id="restart-overlay" class="restart-overlay hidden">
+            <p id="restart-phrase" class="restart-phrase">Algumas histórias merecem ser vividas mais de uma vez.</p>
+        </div>
 
         <!-- Modal (fora das stages para evitar conflito com position: fixed) -->
         <div id="message-modal" class="modal hidden">
