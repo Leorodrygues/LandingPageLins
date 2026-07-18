@@ -797,6 +797,27 @@ class ParticleEngine {
             }, i * 300);
         }
     }
+
+    // Pequena explosão de corações para momento carinhoso
+    spawnHeartBurst() {
+        const colors = ['#ff758f', '#c084fc', '#fcd34d', '#ff9fad', '#e879f9'];
+        for (let i = 0; i < 12; i++) {
+            const angle = (Math.PI * 2 / 12) * i + (Math.random() - 0.5) * 0.5;
+            const speed = 1.5 + Math.random() * 2;
+            this.particles.push({
+                type: 'heart_rain',
+                x: this.canvas.width / 2 + (Math.random() - 0.5) * 100,
+                y: this.canvas.height / 2,
+                vx: Math.cos(angle) * speed,
+                vy: Math.sin(angle) * speed - 2,
+                size: 7 + Math.random() * 8,
+                alpha: 0.8,
+                color: colors[Math.floor(Math.random() * colors.length)],
+                rotation: (Math.random() - 0.5) * 0.3,
+                vRotation: (Math.random() - 0.5) * 0.02
+            });
+        }
+    }
 }
 
 
@@ -1045,6 +1066,12 @@ class StageManager {
                 this.audio.playSound('chime');
                 modal.classList.remove('hidden');
                 this.currentMessage = msgType;
+
+                // Garante que o modal fique visível na viewport
+                window.scrollTo({ top: 0, behavior: 'smooth' });
+
+                // Efeito carinhoso: corações flutuando
+                this.particles.spawnHeartBurst();
             });
         });
 

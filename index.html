@@ -367,14 +367,6 @@
                 </button>
             </div>
 
-            <!-- Modal para exibir as mensagens -->
-            <div id="message-modal" class="modal hidden">
-                <div class="modal-content glass-card">
-                    <span id="close-modal" class="close-modal" aria-label="Fechar janela">&times;</span>
-                    <div id="modal-body-content"></div>
-                </div>
-            </div>
-
             <div class="boxes-footer text-center">
                 <button id="btn-to-cake" class="btn btn-secondary" aria-label="Ir para o bolo de aniversário">
                     <span>Preparar o Bolo 🎂</span>
@@ -477,6 +469,14 @@
                 </button>
             </div>
         </section>
+
+        <!-- Modal (fora das stages para evitar conflito com position: fixed) -->
+        <div id="message-modal" class="modal hidden">
+            <div class="modal-content glass-card">
+                <span id="close-modal" class="close-modal" aria-label="Fechar janela">&times;</span>
+                <div id="modal-body-content"></div>
+            </div>
+        </div>
 
     </main>
 
